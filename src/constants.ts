@@ -2,7 +2,7 @@ export const BRAND = {
   name: "Coach Akram",
   fullName: "Dr. Akram Ikni",
   title: "Bodybuilding Champion & Doctor of Pharmacy",
-  logo: "/logo.png",
+  logo: "/logo01.png",
   colors: {
     primary: "#ec3642",
     dark: "#0a0a0a",
