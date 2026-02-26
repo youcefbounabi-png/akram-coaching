@@ -174,7 +174,7 @@ app.post('/api/chargily/verify-payment', async (req, res) => {
         });
 
         await resend.emails.send({
-            from: 'Akram Coaching Payments <payments@resend.dev>',
+            from: 'Akram Coaching Payments <onboarding@akramcoach.com>',
             to: COACH_EMAIL,
             subject: tpl.subject,
             html: tpl.html,
@@ -214,7 +214,7 @@ app.post('/api/notify-payment', async (req, res) => {
         });
 
         await resend.emails.send({
-            from: 'Akram Coaching Payments <payments@resend.dev>',
+            from: 'Akram Coaching Payments <onboarding@akramcoach.com>',
             to: COACH_EMAIL,
             subject: tpl.subject,
             html: tpl.html,
