@@ -26,7 +26,6 @@ interface Props {
     planPrice: string;
     planPriceNumeric: number;
     planCurrency: string;
-    paymentButtonsDZD: React.ReactNode;
 }
 
 // ─── Field Helpers ────────────────────────────────────────────────────────────
@@ -219,8 +218,7 @@ export default function ClientIntakeModal({
     planName,
     planPrice,
     planPriceNumeric,
-    planCurrency,
-    paymentButtonsDZD
+    planCurrency
 }: Props) {
     const { t, isRTL } = useLanguage();
     const [step, setStep] = useState(0);
@@ -403,7 +401,57 @@ export default function ClientIntakeModal({
                                             </div>
 
                                             {/* BaridiMob/Chargily (DZD only) */}
-                                            {planCurrency === 'DZD' && paymentButtonsDZD}
+                                            {planCurrency === 'DZD' && (
+                                                <div className="mt-4">
+                                                    <button
+                                                        onClick={async (e) => {
+                                                            const btn = e.currentTarget;
+                                                            const origText = btn.innerHTML;
+                                                            btn.innerHTML = '<span class="animate-pulse flex items-center gap-2"><svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Generating Checkout...</span>';
+                                                            btn.classList.add('opacity-80', 'cursor-wait', 'pointer-events-none');
+                                                            try {
+                                                                const successParams = new URLSearchParams({
+                                                                    method: 'Chargily',
+                                                                    plan: planName,
+                                                                    name: data.name,
+                                                                    email: data.email,
+                                                                    amount: planPriceNumeric.toString(),
+                                                                    currency: 'DZD'
+                                                                }).toString();
+
+                                                                const res = await fetch('/api/chargily/create-checkout', {
+                                                                    method: 'POST',
+                                                                    headers: { 'Content-Type': 'application/json' },
+                                                                    body: JSON.stringify({
+                                                                        amount: planPriceNumeric,
+                                                                        currency: 'DZD',
+                                                                        planName: planName,
+                                                                        clientName: data.name,
+                                                                        clientEmail: data.email,
+                                                                        successUrl: window.location.origin + '/payment-success?' + successParams,
+                                                                        failureUrl: window.location.origin + '?payment=failed'
+                                                                    })
+                                                                });
+                                                                const resultData = await res.json();
+
+                                                                if (!res.ok) throw new Error(resultData.error || 'Failed to create payment checkout');
+                                                                if (!resultData.checkoutUrl) throw new Error('No checkout URL returned from server.');
+
+                                                                // Redirect to the Chargily secure checkout
+                                                                window.location.href = resultData.checkoutUrl;
+                                                            } catch (err) {
+                                                                console.error('[chargily-frontend] Error:', err);
+                                                                alert(`Payment Error: ${String(err)}\n\nPlease try again or contact Coach Akram.`);
+                                                                btn.innerHTML = origText;
+                                                                btn.classList.remove('opacity-80', 'cursor-wait', 'pointer-events-none');
+                                                            }
+                                                        }}
+                                                        className="w-full py-4 rounded-2xl bg-brand-red text-white font-bold text-sm tracking-widest uppercase flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer active:scale-95 red-glow focus:outline-none"
+                                                    >
+                                                        Pay with EDAHABIA / CIB
+                                                    </button>
+                                                </div>
+                                            )}
 
                                             {/* PayPal (EUR/USD only) */}
                                             {planCurrency !== 'DZD' && (
@@ -437,6 +485,24 @@ export default function ClientIntakeModal({
                                                                         amount_paid: planPriceNumeric
                                                                     })
                                                                     .eq('id', intakeId);
+                                                            }
+
+                                                            // Inform server to send email to Akram
+                                                            try {
+                                                                await fetch('/api/notify-payment', {
+                                                                    method: 'POST',
+                                                                    headers: { 'Content-Type': 'application/json' },
+                                                                    body: JSON.stringify({
+                                                                        name: data.name,
+                                                                        email: data.email,
+                                                                        plan: planName,
+                                                                        amount: planPriceNumeric,
+                                                                        currency: planCurrency,
+                                                                        method: 'PayPal'
+                                                                    })
+                                                                });
+                                                            } catch (notifyErr) {
+                                                                console.error('[PayPal] Notification error:', notifyErr);
                                                             }
 
                                                             setPaymentStatus('paid');

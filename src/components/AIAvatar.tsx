@@ -19,19 +19,28 @@ const QUICK_PROMPTS = [
 ];
 
 const AUTO_RESPONSES: Record<string, string> = {
-  challenge: `The 90-Day Challenge is our flagship program — you get a custom training plan, precision nutrition, weekly updates, supplement guidance, and 24/7 WhatsApp support with Coach Akram. It's a complete lifestyle transformation.`,
-  price: `Plans start at 18,000 DZD (2 months) up to 50,000 DZD for the 6-month Elite package. You can pay via BaridiMob (Algeria) or PayPal (international). Check /pricing for full details!`,
-  start: `Starting is simple: click the "Join Now" button or message Coach Akram directly on WhatsApp (+213 783 76 62 09). He'll schedule a quick call to understand your goals and build your plan.`,
-  women: `Absolutely! Coach Akram has trained hundreds of women. Programs are fully adapted for female physiology, hormones, and goals — whether it's fat loss, toning, or muscle building.`,
-  default: `Great question! For a personalized answer, I recommend reaching out to Coach Akram directly on WhatsApp — he replies within hours. You can also explore the website for more details.`,
+  challenge: `The 90-Day Challenge is our flagship program — you get a custom training plan, precision nutrition, weekly updates, supplement guidance, and 24/7 WhatsApp support with Coach Akram. It's a complete lifestyle transformation.\n\nتحدي 90 يوم هو برنامجنا الأساسي — ستحصل على خطة تدريب مخصصة، تغذية دقيقة، متابعة أسبوعية، توجيه للمكملات، ودعم 24/7 عبر واتساب مع الكابتن أكرم. إنه تغيير جذري لنمط حياتك.`,
+  price: `Plans start at 18,000 DZD (2 months) up to 50,000 DZD for the 6-month Elite package. You can pay via BaridiMob (Algeria) or PayPal (international). Check /pricing for full details!\n\nتبدأ الخطط من 18,000 دج (شهران) حتى 50,000 دج لباقة النخبة (6 أشهر). يمكنك الدفع عبر بريدي موب أو بايبال. تفضل بزيارة صفحة الأسعار للتفاصيل!`,
+  start: `Starting is simple: click "Join Now" or message Coach Akram directly on WhatsApp (+213 783 76 62 09). He'll schedule a quick call to understand your goals and build your plan.\n\nالبدء بسيط: اضغط على "انضم الآن" أو راسل الكابتن أكرم مباشرة على واتساب (+213 783 76 62 09). سيقوم بتحديد مكالمة سريعة لفهم أهدافك وبناء خطتك.`,
+  women: `Absolutely! Coach Akram has trained hundreds of women. Programs are fully adapted for female physiology, hormones, and goals — whether it's fat loss, toning, or muscle building.\n\nبالتأكيد! درب الكابتن أكرم مئات النساء. البرامج مصممة بالكامل لتناسب فسيولوجيا المرأة وهرموناتها وأهدافها — سواء لحرق الدهون أو الشد أو بناء العضلات.`,
+  default: `Great question! For a personalized answer, I recommend reaching out to Coach Akram directly on WhatsApp — he replies within hours. You can also explore the website for more details.\n\nسؤال ممتاز! للحصول على إجابة مخصصة، أنصحك بالتواصل مع الكابتن أكرم مباشرة على الواتساب — سيرد عليك في غضون ساعات. يمكنك أيضاً تصفح الموقع لمعرفة المزيد.`,
 };
+
+import { askGemini } from '../lib/gemini';
 
 function getResponse(text: string): string {
   const lower = text.toLowerCase();
-  if (lower.includes('challenge') || lower.includes('90')) return AUTO_RESPONSES.challenge;
-  if (lower.includes('price') || lower.includes('cost') || lower.includes('how much') || lower.includes('dzd')) return AUTO_RESPONSES.price;
-  if (lower.includes('start') || lower.includes('begin') || lower.includes('join')) return AUTO_RESPONSES.start;
-  if (lower.includes('women') || lower.includes('female') || lower.includes('girl')) return AUTO_RESPONSES.women;
+
+  const isChallenge = lower.includes('challenge') || lower.includes('90') || lower.includes('تحدي');
+  const isPrice = lower.includes('price') || lower.includes('cost') || lower.includes('how much') || lower.includes('dzd') || lower.includes('سعر') || lower.includes('بكم') || lower.includes('سومة') || lower.includes('ثمن');
+  const isStart = lower.includes('start') || lower.includes('begin') || lower.includes('join') || lower.includes('كيف') || lower.includes('اشتراك') || lower.includes('نبدأ');
+  const isWomen = lower.includes('women') || lower.includes('female') || lower.includes('girl') || lower.includes('نساء') || lower.includes('بنات') || lower.includes('امرأة');
+
+  if (isChallenge) return AUTO_RESPONSES.challenge;
+  if (isPrice) return AUTO_RESPONSES.price;
+  if (isStart) return AUTO_RESPONSES.start;
+  if (isWomen) return AUTO_RESPONSES.women;
+
   return AUTO_RESPONSES.default;
 }
 
@@ -46,9 +55,16 @@ export default function AIAvatar() {
     setMessages(m => [...m, { role: 'user', text: text.trim() }]);
     setInput('');
     setIsTyping(true);
-    await new Promise(r => setTimeout(r, 1000 + Math.random() * 600));
+
+    const reply = await askGemini(text, false);
     setIsTyping(false);
-    setMessages(m => [...m, { role: 'akram', text: getResponse(text) }]);
+
+    if (reply) {
+      setMessages(m => [...m, { role: 'akram', text: reply }]);
+    } else {
+      await new Promise(r => setTimeout(r, 600));
+      setMessages(m => [...m, { role: 'akram', text: getResponse(text) }]);
+    }
   };
 
   return (

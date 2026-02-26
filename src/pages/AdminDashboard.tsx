@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
     AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
@@ -157,20 +157,20 @@ function StatCard({
     trend?: string;
 }) {
     return (
-        <div className="glass-panel rounded-2xl p-6 border border-white/8 hover:border-white/15 transition-all duration-300 cursor-default">
-            <div className="flex items-start justify-between mb-4">
-                <div className="w-10 h-10 rounded-xl bg-brand-red/10 border border-brand-red/20 flex items-center justify-center">
-                    <Icon size={18} className="text-brand-red" />
+        <div className="glass-panel rounded-2xl p-4 md:p-6 border border-white/8 hover:border-white/15 transition-all duration-300 cursor-default">
+            <div className="flex items-start justify-between mb-3 md:mb-4">
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-brand-red/10 border border-brand-red/20 flex items-center justify-center">
+                    <Icon size={16} className="text-brand-red md:w-[18px] md:h-[18px]" />
                 </div>
                 {trend && (
-                    <span className="text-emerald-400 text-xs font-bold bg-emerald-400/10 px-2 py-0.5 rounded-full">
+                    <span className="text-emerald-400 text-[9px] md:text-xs font-bold bg-emerald-400/10 px-2 py-0.5 rounded-full">
                         {trend}
                     </span>
                 )}
             </div>
-            <div className="text-3xl font-display font-black tracking-tight mb-1">{value}</div>
-            <div className="text-white/40 text-xs uppercase tracking-[0.12em] font-medium">{label}</div>
-            {sub && <div className="text-white/30 text-xs mt-1">{sub}</div>}
+            <div className="text-xl md:text-3xl font-display font-black tracking-tight mb-1">{value}</div>
+            <div className="text-white/40 text-[9px] md:text-xs uppercase tracking-[0.12em] font-medium leading-tight">{label}</div>
+            {sub && <div className="text-white/30 text-[9px] md:text-xs mt-1 md:mt-1 leading-tight">{sub}</div>}
         </div>
     );
 }
@@ -415,13 +415,13 @@ function DashboardContent({ onLogout }: { onLogout: () => void }) {
                     </div>
 
                     {/* Nav Tabs */}
-                    <nav className="hidden md:flex items-center gap-1 glass-panel rounded-full p-1">
+                    <nav className="flex items-center gap-1 glass-panel rounded-full p-1 overflow-x-auto hide-scrollbar max-w-[50%] md:max-w-none">
                         {(['overview', 'bookings', 'messages'] as const).map((s) => (
                             <button
                                 key={s}
                                 onClick={() => setActiveSection(s)}
                                 className={cn(
-                                    'px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all cursor-pointer relative',
+                                    'px-3 md:px-4 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all cursor-pointer relative whitespace-nowrap',
                                     activeSection === s ? 'bg-brand-red text-white' : 'text-white/50 hover:text-white'
                                 )}
                             >
@@ -657,8 +657,8 @@ function DashboardContent({ onLogout }: { onLogout: () => void }) {
                                             msg.status !== 'pending' ? 'border-white/6 opacity-70' : 'border-brand-red/20'
                                         )}
                                     >
-                                        <div className="flex items-start justify-between gap-4">
-                                            <div className="flex items-start gap-4 min-w-0">
+                                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
+                                            <div className="flex items-start gap-3 sm:gap-4 min-w-0 flex-1">
                                                 <div className={cn(
                                                     'w-9 h-9 rounded-xl flex items-center justify-center shrink-0 font-bold text-sm',
                                                     msg.type === 'booking' ? 'bg-emerald-500/15 text-emerald-400' :
@@ -666,9 +666,9 @@ function DashboardContent({ onLogout }: { onLogout: () => void }) {
                                                 )}>
                                                     {msg.type === 'booking' ? '📅' : msg.name[0]}
                                                 </div>
-                                                <div className="min-w-0">
-                                                    <div className="flex items-center gap-2 mb-0.5">
-                                                        <span className={cn('font-bold text-sm', msg.status !== 'pending' ? 'text-white/60' : 'text-white')}>
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="flex items-center flex-wrap gap-2 mb-0.5">
+                                                        <span className={cn('font-bold text-sm tracking-wide', msg.status !== 'pending' ? 'text-white/60' : 'text-white')}>
                                                             {msg.name}
                                                         </span>
                                                         {msg.type === 'booking' && (
@@ -680,20 +680,20 @@ function DashboardContent({ onLogout }: { onLogout: () => void }) {
                                                     </div>
                                                     <div className="text-white/30 text-xs mb-1">
                                                         {msg.email || msg.phone}
-                                                        {msg.type === 'booking' && ` • Scheduled: ${msg.date} @ ${msg.time}`}
+                                                        {msg.type === 'booking' && <span className="block sm:inline sm:before:content-['•'] sm:before:mx-2 mt-0.5 sm:mt-0 text-[10px] sm:text-xs">Scheduled: {msg.date} @ {msg.time}</span>}
                                                     </div>
-                                                    <div className={cn('text-sm', msg.status !== 'pending' ? 'text-white/40' : 'text-white/80')}>
-                                                        {msg.goals && <span className="opacity-60">Goal: </span>}
+                                                    <div className={cn('text-xs sm:text-sm mt-2 leading-relaxed', msg.status !== 'pending' ? 'text-white/40' : 'text-white/80')}>
+                                                        {msg.goals && <span className="opacity-60 block text-[10px] uppercase tracking-wider mb-0.5">Goal</span>}
                                                         {msg.goals || 'General Inquiry'}
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="flex flex-col items-end gap-2 shrink-0">
-                                                <span className="text-white/25 text-xs mt-0.5">{msg.submittedAt.split(',')[1] || msg.submittedAt}</span>
+                                            <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2 shrink-0 border-t sm:border-0 border-white/5 pt-3 sm:pt-0 mt-2 sm:mt-0 w-full sm:w-auto">
+                                                <span className="text-white/25 text-[10px] sm:text-xs">{msg.submittedAt.split(',')[1] || msg.submittedAt}</span>
                                                 {msg.status === 'pending' && (
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); handleUpdateStatus(msg.id, 'contacted', msg.type); }}
-                                                        className="text-[9px] font-black uppercase tracking-wider bg-brand-red text-white px-2 py-0.5 rounded"
+                                                        className="text-[10px] font-black uppercase tracking-wider bg-brand-red text-white px-3 py-1.5 sm:px-2 sm:py-0.5 rounded active:scale-95 transition-transform"
                                                     >
                                                         Mark Done
                                                     </button>

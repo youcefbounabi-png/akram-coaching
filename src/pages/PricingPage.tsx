@@ -96,21 +96,6 @@ export default function PricingPage() {
         setIsModalOpen(true);
     };
 
-    const renderDZDButton = (plan: any) => (
-        <a
-            href={plan.chargelyUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={cn(
-                'w-full py-4 rounded-2xl font-bold text-sm tracking-widest uppercase text-center flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer active:scale-95',
-                plan.popular ? 'bg-brand-red text-white hover:bg-brand-red/90 red-glow' : 'bg-white/5 hover:bg-white/10 border border-white/10 text-white'
-            )}
-        >
-            <Shield size={14} aria-hidden="true" />
-            {tp.payBaridi}
-        </a>
-    );
-
 
     return (
         <motion.div
@@ -298,7 +283,6 @@ export default function PricingPage() {
                         planPrice={selectedPlan ? `${currency !== 'dzd' ? currencyLabel[currency] : ''}${selectedPlan.price[currency]} ${currency === 'dzd' ? 'DZD' : ''}` : ''}
                         planPriceNumeric={selectedPlan?.priceNumeric[currency] || 0}
                         planCurrency={currency.toUpperCase()}
-                        paymentButtonsDZD={renderDZDButton(selectedPlan)}
                     />
                 </PayPalScriptProvider>
             )}

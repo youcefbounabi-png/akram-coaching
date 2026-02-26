@@ -210,4 +210,62 @@ function clientConfirmationEmail(data) {
   };
 }
 
-export { coachEmail, clientConfirmationEmail };
+/**
+ * Email sent to Coach Akram when a payment is successful
+ */
+function paymentNotificationEmail(data) {
+  const { name, email, plan, amount, currency, method, date } = data;
+
+  const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#050505;font-family:'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#050505;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+
+        <!-- Header -->
+        <tr><td style="background:linear-gradient(135deg,#0a0a0a,#1a0a0a);border:1px solid #2a1a1a;border-radius:16px 16px 0 0;padding:32px;text-align:center;">
+          <div style="display:inline-block;background:${BRAND_RED};color:#fff;font-size:24px;font-weight:900;letter-spacing:-0.02em;padding:10px 20px;border-radius:12px;margin-bottom:16px;">💰 PAYMENT RECEIVED</div>
+          <h1 style="color:#fff;font-size:20px;font-weight:800;margin:0;letter-spacing:-0.01em;">${plan.toLowerCase().includes('book') ? 'New E-Book Purchase!' : 'New Subscription Confirmed!'}</h1>
+        </td></tr>
+
+        <!-- Body -->
+        <tr><td style="background:#0d0d0d;border:1px solid #1f1f1f;border-top:none;border-bottom:none;padding:32px;">
+
+          ${section('💳 Transaction Details', [
+    row('Client Name', name),
+    row('Email', email),
+    row('Plan', plan),
+    row('Amount', `${amount} ${currency}`),
+    row('Method', method),
+    row('Date', date),
+  ].join(''))}
+
+
+          <div style="margin-top:20px;padding:20px;background:#1a1a1a;border:1px solid #333;border-radius:12px;text-align:center;">
+             <p style="color:#fff;font-size:16px;margin:0 0 12px;font-weight:600;">${plan.toLowerCase().includes('book') ? 'Please send the e-book file to the client.' : 'Check the Admin Dashboard for details.'}</p>
+             <p style="color:#9ca3af;font-size:14px;margin:0;">${plan.toLowerCase().includes('book') ? 'This is a digital book purchase.' : 'The client\'s status has been automatically updated to Paid.'}</p>
+          </div>
+
+        </td></tr>
+
+        <!-- Footer -->
+        <tr><td style="background:#0a0a0a;border:1px solid #1f1f1f;border-top:none;border-radius:0 0 16px 16px;padding:24px;text-align:center;">
+          <p style="color:#374151;font-size:11px;margin:0;">Akram Coaching Automated Payment System</p>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  return {
+    subject: `💰 ${plan.toLowerCase().includes('book') ? 'E-Book Sold' : 'Payment Received'}: ${amount} ${currency} from ${name}`,
+    html,
+  };
+}
+
+export { coachEmail, clientConfirmationEmail, paymentNotificationEmail };

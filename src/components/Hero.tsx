@@ -145,14 +145,14 @@ export default function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center px-4 pt-20 pb-4 bg-black/80 backdrop-blur-xl"
+            className="fixed inset-0 z-50 flex items-center justify-center px-4 md:pt-20 pb-4 bg-black/80 backdrop-blur-xl"
             dir={isRTL ? 'rtl' : 'ltr'}
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="relative w-full max-w-5xl aspect-video rounded-2xl overflow-hidden glass-panel border border-brand-red/30 shadow-[0_0_50px_rgba(236,54,66,0.15)] flex flex-col"
+              className="relative w-full max-w-5xl h-auto max-h-[90vh] rounded-2xl overflow-hidden glass-panel border border-brand-red/30 shadow-[0_0_50px_rgba(236,54,66,0.15)] flex flex-col"
             >
               <button
                 onClick={() => setIsVideoOpen(false)}
@@ -160,7 +160,7 @@ export default function Hero() {
               >
                 <X size={18} />
               </button>
-              <div className="flex-1 w-full bg-black relative">
+              <div className="w-full bg-black relative aspect-video">
                 <iframe
                   className="absolute inset-0 w-full h-full"
                   src="https://www.youtube.com/embed/NU3fqbuaxbQ?autoplay=1&mute=0"

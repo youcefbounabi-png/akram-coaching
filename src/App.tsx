@@ -4,6 +4,7 @@ import { AnimatePresence } from 'motion/react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import BackToTop from './components/BackToTop';
+import FloatingChatbot from './components/FloatingChatbot';
 import { supabase } from './lib/supabase';
 import Home from './Home';
 import About from './components/About';
@@ -13,6 +14,7 @@ import TransformationsPage from './pages/TransformationsPage';
 import PricingPage from './pages/PricingPage';
 import ContactPage from './pages/ContactPage';
 import AdminDashboard from './pages/AdminDashboard';
+import PaymentSuccess from './pages/PaymentSuccess';
 
 // Lazy-load the heavy WebGL background — code-splits the Three.js bundle
 // so it never blocks the initial page paint
@@ -66,12 +68,14 @@ function AppLayout() {
             <Route path="/transformations" element={<TransformationsPage />} />
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/admin" element={<AdminDashboard />} />
           </Routes>
         </AnimatePresence>
       </main>
       {!isAdmin && <Footer />}
       {!isAdmin && <BackToTop />}
+      {!isAdmin && <FloatingChatbot />}
     </div>
   );
 }
