@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BRAND } from '../constants';
+import { Link } from 'react-router-dom';
 import { ArrowRight, Play, ShieldCheck, X, Youtube } from 'lucide-react';
 import FloatingHero from './3d/FloatingHero';
 import { useGSAP } from '@gsap/react';
@@ -107,8 +108,8 @@ export default function Hero() {
           />
 
           <div className="flex flex-col sm:flex-row items-center gap-6">
-            <a
-              href="#pricing"
+            <Link
+              to="/pricing"
               className="hero-cta w-full sm:w-auto bg-brand-red text-white px-10 py-5 rounded-full font-bold text-lg flex items-center justify-center gap-3 transition-all duration-500 hover:scale-105 active:scale-95 red-glow-strong group overflow-hidden relative cursor-pointer"
             >
               <span className="relative z-10 flex items-center gap-2">
@@ -116,7 +117,7 @@ export default function Hero() {
                 <ArrowRight size={20} className={cn('transition-transform', isRTL ? 'group-hover:-translate-x-1 rotate-180' : 'group-hover:translate-x-1')} />
               </span>
               <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
-            </a>
+            </Link>
             <button
               onClick={() => setIsVideoOpen(true)}
               className="hero-cta w-full sm:w-auto flex items-center justify-center gap-4 px-8 py-5 rounded-full glass-panel glass-panel-hover group cursor-pointer"
@@ -130,12 +131,19 @@ export default function Hero() {
 
           {/* Stats — kept dir=ltr so numbers always render left-to-right */}
           <div className="mt-16 flex flex-wrap items-center gap-x-12 gap-y-8 border-t border-white/10 pt-10" dir="ltr">
-            {BRAND.stats.slice(0, 3).map((stat) => (
-              <div key={stat.label} className="hero-stats group">
-                <div className="text-3xl md:text-4xl font-display font-black text-white group-hover:text-brand-red transition-colors duration-300">{stat.value}</div>
-                <div className="text-xs text-white/40 uppercase tracking-[0.15em] mt-1 font-medium">{stat.label}</div>
-              </div>
-            ))}
+            {BRAND.stats.slice(0, 3).map((stat) => {
+              const content = (
+                <div key={stat.label} className="hero-stats group cursor-pointer">
+                  <div className="text-3xl md:text-4xl font-display font-black text-white group-hover:text-brand-red transition-colors duration-300">{stat.value}</div>
+                  <div className="text-xs text-white/40 uppercase tracking-[0.15em] mt-1 font-medium">{stat.label}</div>
+                </div>
+              );
+
+              if (stat.label === "Success Stories" || stat.label === "Success stories") {
+                return <Link key={stat.label} to="/transformations">{content}</Link>;
+              }
+              return content;
+            })}
           </div>
         </div>
       </div>
