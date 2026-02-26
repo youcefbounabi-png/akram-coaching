@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -105,9 +106,12 @@ export default function Transformations() {
         </div>
 
         <div className="mt-20 text-center">
-          <button className="px-12 py-5 rounded-full border border-white/20 font-bold hover:bg-white hover:text-brand-dark transition-all duration-300 tracking-wide">
+          <Link
+            to="/transformations"
+            className="inline-block px-12 py-5 rounded-full border border-white/20 font-bold hover:bg-white hover:text-brand-dark transition-all duration-300 tracking-wide"
+          >
             View All Transformations
-          </button>
+          </Link>
         </div>
       </div>
     </section>

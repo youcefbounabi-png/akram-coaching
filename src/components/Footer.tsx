@@ -1,5 +1,5 @@
 import { BRAND } from '../constants';
-import { Instagram, Facebook, Youtube, Send, MessageCircle } from 'lucide-react';
+import { Instagram, Facebook, Youtube, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../i18n/LanguageContext';
 
@@ -35,7 +35,6 @@ export default function Footer() {
                 { icon: Instagram, href: BRAND.socials.instagram },
                 { icon: Facebook, href: BRAND.socials.facebook },
                 { icon: Youtube, href: BRAND.socials.youtube },
-                { icon: Send, href: BRAND.socials.telegram },
                 { icon: MessageCircle, href: BRAND.socials.whatsapp },
               ].map((social, i) => (
                 <a
