@@ -273,7 +273,7 @@ function BookCheckoutFlow({ book, isRTL, t, onClose }: { book: any, isRTL: boole
                 currency: 'DZD'
             }).toString();
 
-            const res = await fetch('/api/chargily/create-checkout', {
+            const res = await fetch('https://akram-coaching.onrender.com/api/chargily/create-checkout', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

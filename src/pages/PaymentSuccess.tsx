@@ -36,7 +36,7 @@ export default function PaymentSuccess() {
             try {
                 if (checkoutId) {
                     // Chargily Secure Flow
-                    const verifyRes = await fetch('/api/chargily/verify-payment', {
+                    const verifyRes = await fetch('https://akram-coaching.onrender.com/api/chargily/verify-payment', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ checkoutId })
@@ -59,7 +59,7 @@ export default function PaymentSuccess() {
                     }
                 } else if (name && amount) {
                     // Legacy PayPal Flow
-                    const res = await fetch('/api/notify-payment', {
+                    const res = await fetch('https://akram-coaching.onrender.com/api/notify-payment', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name, email, plan, amount, currency, method })

@@ -256,7 +256,7 @@ export default function ClientIntakeModal({
                 setIntakeId(insertedData[0].id);
             }
 
-            await fetch('/api/send-email', {
+            await fetch('https://akram-coaching.onrender.com/api/send-email', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ...data, plan: planName, type: 'intake' }),
@@ -419,7 +419,7 @@ export default function ClientIntakeModal({
                                                                     currency: 'DZD'
                                                                 }).toString();
 
-                                                                const res = await fetch('/api/chargily/create-checkout', {
+                                                                const res = await fetch('https://akram-coaching.onrender.com/api/chargily/create-checkout', {
                                                                     method: 'POST',
                                                                     headers: { 'Content-Type': 'application/json' },
                                                                     body: JSON.stringify({
@@ -489,7 +489,7 @@ export default function ClientIntakeModal({
 
                                                             // Inform server to send email to Akram
                                                             try {
-                                                                await fetch('/api/notify-payment', {
+                                                                await fetch('https://akram-coaching.onrender.com/api/notify-payment', {
                                                                     method: 'POST',
                                                                     headers: { 'Content-Type': 'application/json' },
                                                                     body: JSON.stringify({

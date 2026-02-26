@@ -104,7 +104,7 @@ export default function ContactPage() {
                 'health': 'Health Optimization'
             };
 
-            await fetch('/api/send-email', {
+            await fetch('https://akram-coaching.onrender.com/api/send-email', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
