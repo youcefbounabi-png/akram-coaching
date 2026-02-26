@@ -93,6 +93,17 @@ app.post('/api/send-email', async (req, res) => {
         processPic(data.sidePic, 'side_progress.jpg');
         processPic(data.backPic, 'back_progress.jpg');
 
+        console.log(`[server] Sending email for ${data.type} with ${attachments.length} attachments`);
+
+        // Always send notification to the Coach
+        const emailOptions = {
+            from: 'Akram Coaching <info@akramcoach.com>',
+            to: COACH_EMAIL,
+            reply_to: data.email || undefined,
+            subject: coachTpl.subject,
+            html: coachTpl.html,
+        };
+
         if (attachments.length > 0) {
             emailOptions.attachments = attachments;
         }
