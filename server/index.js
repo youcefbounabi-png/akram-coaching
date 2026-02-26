@@ -93,37 +93,32 @@ app.post('/api/send-email', async (req, res) => {
         processPic(data.sidePic, 'side_progress.jpg');
         processPic(data.backPic, 'back_progress.jpg');
 
-        console.log(`[server] Sending email for ${data.type} with ${attachments.length} attachments`);
-
-        console.log(`[server] Sending email for ${data.type} with ${attachments.length} attachments`);
-
-        // Always send notification to the Coach
-        const emailOptions = {
-            from: 'Akram Coaching <onboarding@akramcoach.com>',
-            to: COACH_EMAIL,
-            reply_to: data.email || undefined,
-            subject: coachTpl.subject,
-            html: coachTpl.html,
-        };
-
         if (attachments.length > 0) {
             emailOptions.attachments = attachments;
         }
 
         const coachResult = await resend.emails.send(emailOptions);
-        console.log('[server] Coach email success:', !!coachResult.data, coachResult.error || '');
+        if (coachResult.error) {
+            console.error('[server] Resend API Error (Coach Email):', JSON.stringify(coachResult.error));
+        } else {
+            console.log('[server] Coach email success:', coachResult.data.id);
+        }
 
         // Try to send confirmation to client using the verified domain
         if (data.email && data.email.includes('@')) {
             const clientTpl = clientConfirmationEmail(data);
             try {
                 const clientResult = await resend.emails.send({
-                    from: 'Coach Akram <onboarding@akramcoach.com>',
+                    from: 'Coach Akram <info@akramcoach.com>',
                     to: data.email,
                     subject: clientTpl.subject,
                     html: clientTpl.html,
                 });
-                console.log('[server] Client confirmation success:', !!clientResult.data);
+                if (clientResult.error) {
+                    console.warn('[server] Resend API Warning (Client Email):', JSON.stringify(clientResult.error));
+                } else {
+                    console.log('[server] Client confirmation success:', clientResult.data.id);
+                }
             } catch (clientErr) {
                 console.warn('[server] Could not send to client email:', clientErr.message);
             }
