@@ -48,8 +48,10 @@ export default function Hero() {
           )}
           style={{
             // mask fades from the INNER edge (toward text) to transparent
-            WebkitMaskImage: `linear-gradient(to ${isRTL ? 'left' : 'right'}, transparent 0%, rgba(0,0,0,0.05) 15%, black 45%, black 100%)`,
-            maskImage: `linear-gradient(to ${isRTL ? 'left' : 'right'}, transparent 0%, rgba(0,0,0,0.05) 15%, black 45%, black 100%)`,
+            WebkitMaskImage: `linear-gradient(to ${isRTL ? 'left' : 'right'}, transparent 0%, rgba(0,0,0,0.05) 15%, black 45%, black 100%), linear-gradient(to top, transparent 0%, black 15%, black 100%)`,
+            WebkitMaskComposite: 'source-in',
+            maskImage: `linear-gradient(to ${isRTL ? 'left' : 'right'}, transparent 0%, rgba(0,0,0,0.05) 15%, black 45%, black 100%), linear-gradient(to top, transparent 0%, black 15%, black 100%)`,
+            maskComposite: 'intersect',
           }}
         >
           <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-brand-dark/50 z-10" />
