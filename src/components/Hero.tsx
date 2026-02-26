@@ -55,7 +55,7 @@ export default function Hero() {
           <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-brand-dark/50 z-10" />
           <div className="absolute inset-0 bg-brand-red/20 mix-blend-multiply z-10" />
           <img
-            src="https://akramcoach.com/wp-content/uploads/2024/12/Design-sans-titre-1-768x768.png"
+            src="/herorenwed.png"
             alt="Dr. Akram Ikni"
             className="w-full h-full object-cover object-center hero-bg-img grayscale mix-blend-luminosity opacity-0"
             fetchPriority="high"

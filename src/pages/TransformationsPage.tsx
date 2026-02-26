@@ -27,12 +27,12 @@ export default function TransformationsPage() {
         { img: '/books/transformation7mths.png', name: isRTL ? 'وليد' : 'Walid', duration: isRTL ? '7 أشهر' : '7 months', result: isRTL ? 'عضلات وبنية ضخمة' : 'Massive muscle definition', category: 'muscle' },
         { img: '/books/photo_2024-12-28_02-39-43-818x1024 (2).webp', name: isRTL ? 'عمر' : 'Omar', duration: isRTL ? '90 يومًا' : '90 days', result: isRTL ? 'فقدان دهون وبناء عضل' : 'Fat loss & Lean muscle', category: '90-day' },
         { img: '/books/photo_2024-12-28_02-39-43-818x1024 (1).png', name: isRTL ? 'حسن' : 'Hassan', duration: isRTL ? '60 يومًا' : '60 days', result: isRTL ? 'لياقة بدنية وقوة' : 'Fitness & Strength', category: 'fat-loss' },
-        { img: 'https://akramcoach.com/wp-content/uploads/2024/12/24-819x1024.png', name: isRTL ? 'أحمد' : 'Ahmed', duration: isRTL ? '90 يومًا' : '90 days', result: isRTL ? '-18 كغ دهون' : '-18kg body fat', category: 'fat-loss' },
-        { img: 'https://akramcoach.com/wp-content/uploads/2024/12/17-1-819x1024.png', name: isRTL ? 'كريم' : 'Karim', duration: isRTL ? '60 يومًا' : '60 days', result: isRTL ? '+8 كغ عضل صافي' : '+8kg lean muscle', category: 'muscle' },
-        { img: 'https://akramcoach.com/wp-content/uploads/2024/12/IMG_0021-2-819x1024.png', name: isRTL ? 'يوسف' : 'Youssef', duration: isRTL ? '90 يومًا' : '90 days', result: isRTL ? 'إعادة تشكيل كامل للجسم' : 'Full body recomp', category: '90-day' },
-        { img: 'https://akramcoach.com/wp-content/uploads/2024/12/7-819x1024.png', name: isRTL ? 'مهدي' : 'Mehdi', duration: isRTL ? '90 يومًا' : '90 days', result: isRTL ? '-22 كغ إجمالي' : '-22kg total', category: 'fat-loss' },
-        { img: 'https://akramcoach.com/wp-content/uploads/2024/12/12345-1-1024x1024.png', name: isRTL ? 'طارق' : 'Tariq', duration: isRTL ? '60 يومًا' : '60 days', result: isRTL ? 'جسم مشدود' : 'Lean & toned', category: 'muscle' },
-        { img: 'https://akramcoach.com/wp-content/uploads/2024/12/IMG_0045-2-1024x1024.png', name: isRTL ? 'رياض' : 'Riad', duration: isRTL ? '6 أشهر' : '6 months', result: isRTL ? 'تجهيز بطولة' : 'Competition prep', category: 'muscle' },
+        { img: '/transformations/transformation_1.jpg', name: isRTL ? 'أحمد' : 'Ahmed', duration: isRTL ? '90 يومًا' : '90 days', result: isRTL ? '-18 كغ دهون' : '-18kg body fat', category: 'fat-loss' },
+        { img: '/transformations/transformation_2.jpg', name: isRTL ? 'كريم' : 'Karim', duration: isRTL ? '60 يومًا' : '60 days', result: isRTL ? '+8 كغ عضل صافي' : '+8kg lean muscle', category: 'muscle' },
+        { img: '/transformations/transformation_3.jpg', name: isRTL ? 'يوسف' : 'Youssef', duration: isRTL ? '90 يومًا' : '90 days', result: isRTL ? 'إعادة تشكيل كامل للجسم' : 'Full body recomp', category: '90-day' },
+        { img: '/transformations/transformation_4.jpg', name: isRTL ? 'مهدي' : 'Mehdi', duration: isRTL ? '90 يومًا' : '90 days', result: isRTL ? '-22 كغ إجمالي' : '-22kg total', category: 'fat-loss' },
+        { img: '/transformations/transformation_5.jpg', name: isRTL ? 'طارق' : 'Tariq', duration: isRTL ? '60 يومًا' : '60 days', result: isRTL ? 'جسم مشدود' : 'Lean & toned', category: 'muscle' },
+        { img: '/transformations/transformation_6.jpg', name: isRTL ? 'رياض' : 'Riad', duration: isRTL ? '6 أشهر' : '6 months', result: isRTL ? 'تجهيز بطولة' : 'Competition prep', category: 'muscle' },
 
         // ── New Photos from Akram (WhatsApp, Feb 2026) ──────────────────────────
         { img: '/books/WhatsApp Image 2026-02-25 at 12.27.58 AM.jpeg', name: isRTL ? 'سامي' : 'Sami', duration: isRTL ? '90 يومًا' : '90 days', result: isRTL ? '-15 كغ دهون' : '-15kg body fat', category: '90-day' },

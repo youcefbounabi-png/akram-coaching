@@ -7,15 +7,15 @@ import { ArrowUpRight } from 'lucide-react';
 gsap.registerPlugin(ScrollTrigger);
 
 const transformations = [
-  { img: "/books/WhatsApp Image 2026-02-25 at 12.28.03 AM (4).jpeg", name: "Sara", tag: "Female Program", isFemale: true },
-  { img: "/books/WhatsApp Image 2026-02-25 at 12.28.06 AM.jpeg", name: "Yacine", tag: "Muscle Gain" },
-  { img: "/books/WhatsApp Image 2026-02-25 at 12.28.03 AM (1).jpeg", name: "Farid", tag: "Fat Loss" },
-  { img: "https://akramcoach.com/wp-content/uploads/2024/12/24-819x1024.png", name: "Ahmed", tag: "Fat Loss" },
-  { img: "/books/transformation7mths.png", name: "Walid", tag: "Muscle Gain" },
-  { img: "/books/photo_2024-12-28_02-39-43-818x1024 (2).webp", name: "Omar", tag: "90-Day Challenge" },
-  { img: "https://akramcoach.com/wp-content/uploads/2024/12/17-1-819x1024.png", name: "Karim", tag: "Muscle Gain" },
-  { img: "/books/WhatsApp Image 2026-02-25 at 12.28.02 AM.jpeg", name: "Amine", tag: "Muscle Gain" },
-  { img: "/books/WhatsApp Image 2026-02-25 at 12.27.59 AM (1).jpeg", name: "Bilal", tag: "Muscle Gain" }
+  { img: "/transformations/transformation_4.jpg", name: "Sara", tag: "Female Program", isFemale: true },
+  { img: "/transformations/transformation_6.jpg", name: "Yacine", tag: "Muscle Gain" },
+  { img: "/transformations/transformation_1.jpg", name: "Farid", tag: "Fat Loss" },
+  { img: "/transformations/transformation_1.jpg", name: "Ahmed", tag: "Fat Loss" },
+  { img: "/transformations/transformation_2.jpg", name: "Walid", tag: "Muscle Gain" },
+  { img: "/transformations/transformation_3.jpg", name: "Omar", tag: "90-Day Challenge" },
+  { img: "/transformations/transformation_5.jpg", name: "Karim", tag: "Muscle Gain" },
+  { img: "/transformations/transformation_6.jpg", name: "Amine", tag: "Muscle Gain" },
+  { img: "/transformations/transformation_1.jpg", name: "Bilal", tag: "Muscle Gain" }
 ];
 
 export default function Transformations() {
