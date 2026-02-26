@@ -260,7 +260,9 @@ export default function ClientIntakeModal({
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ...data, plan: planName, type: 'intake' }),
-            }).catch(() => { });
+            }).then(r => {
+                if (!r.ok) console.warn('[Intake] Email automation might have failed.');
+            }).catch(e => console.error('[Intake] Email API unreachable:', e));
 
             setStatus('success');
         } catch (error) {

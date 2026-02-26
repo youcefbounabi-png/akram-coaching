@@ -116,7 +116,9 @@ export default function ContactPage() {
                     time: selectedTime || undefined,
                     type: isBooking ? 'booking' : 'contact'
                 }),
-            }).catch(() => { });
+            }).then(r => {
+                if (!r.ok) console.warn('[Contact] Email automation might have failed.');
+            }).catch(e => console.error('[Contact] Email API unreachable:', e));
 
             setSubmitted(true);
         } catch (error) {

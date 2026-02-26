@@ -95,9 +95,11 @@ app.post('/api/send-email', async (req, res) => {
 
         console.log(`[server] Sending email for ${data.type} with ${attachments.length} attachments`);
 
+        console.log(`[server] Sending email for ${data.type} with ${attachments.length} attachments`);
+
         // Always send notification to the Coach
         const emailOptions = {
-            from: 'Akram Coaching <onboarding@resend.dev>',
+            from: 'Akram Coaching <onboarding@akramcoach.com>',
             to: COACH_EMAIL,
             reply_to: data.email || undefined,
             subject: coachTpl.subject,
@@ -109,22 +111,21 @@ app.post('/api/send-email', async (req, res) => {
         }
 
         const coachResult = await resend.emails.send(emailOptions);
-        console.log('[server] Coach email result:', coachResult);
+        console.log('[server] Coach email success:', !!coachResult.data, coachResult.error || '');
 
-        // Try to send confirmation to client using the verified domain / same onboarding trick
-        // NOTE: On Resend Free Tier without a verified domain, sending to random client emails will throw an error. 
-        // We catch it and ignore so it doesn't break the submission flow.
+        // Try to send confirmation to client using the verified domain
         if (data.email && data.email.includes('@')) {
             const clientTpl = clientConfirmationEmail(data);
             try {
-                await resend.emails.send({
-                    from: 'Coach Akram <onboarding@resend.dev>',
+                const clientResult = await resend.emails.send({
+                    from: 'Coach Akram <onboarding@akramcoach.com>',
                     to: data.email,
                     subject: clientTpl.subject,
                     html: clientTpl.html,
                 });
+                console.log('[server] Client confirmation success:', !!clientResult.data);
             } catch (clientErr) {
-                console.warn('[server] Could not send to client email (Free Tier limitation):', clientErr.message);
+                console.warn('[server] Could not send to client email:', clientErr.message);
             }
         }
 
