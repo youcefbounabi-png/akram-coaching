@@ -6,6 +6,7 @@ import { cn } from '../lib/utils';
 import { useLanguage } from '../i18n/LanguageContext';
 import { BRAND } from '../constants';
 import { supabase } from '../lib/supabase';
+import type { TranslationKeys } from '../i18n/translations';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -114,7 +115,7 @@ function ImageUpload({ label, value, onChange }: { label: string; value: string;
 
 // ─── Steps ────────────────────────────────────────────────────────────────────
 
-function Step1({ data, update, t }: { data: IntakeData; update: (k: keyof IntakeData, v: string) => void; t: any }) {
+function Step1({ data, update, t }: { data: IntakeData; update: (k: keyof IntakeData, v: string) => void; t: TranslationKeys }) {
     const f = t.intake.fields;
     return (
         <div className="space-y-5">
@@ -148,7 +149,7 @@ function Step1({ data, update, t }: { data: IntakeData; update: (k: keyof Intake
     );
 }
 
-function Step2({ data, update, t }: { data: IntakeData; update: (k: keyof IntakeData, v: string) => void; t: any }) {
+function Step2({ data, update, t }: { data: IntakeData; update: (k: keyof IntakeData, v: string) => void; t: TranslationKeys }) {
     const f = t.intake.fields;
     return (
         <div className="space-y-5">
@@ -177,7 +178,7 @@ function Step2({ data, update, t }: { data: IntakeData; update: (k: keyof Intake
     );
 }
 
-function Step3({ data, update, t }: { data: IntakeData; update: (k: keyof IntakeData, v: string) => void; t: any }) {
+function Step3({ data, update, t }: { data: IntakeData; update: (k: keyof IntakeData, v: string) => void; t: TranslationKeys }) {
     const f = t.intake.fields;
     return (
         <div className="space-y-5">
@@ -468,7 +469,7 @@ export default function ClientIntakeModal({
                                                                     {
                                                                         description: `${planName} Coaching Plan`,
                                                                         amount: {
-                                                                            currency_code: planCurrency as any,
+                                                                            currency_code: planCurrency,
                                                                             value: planPriceNumeric.toString(),
                                                                         },
                                                                     },

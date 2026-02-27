@@ -10,15 +10,27 @@ import ClientIntakeModal from '../components/ClientIntakeModal';
 
 type Currency = 'dzd' | 'eur' | 'usd';
 
+interface Plan {
+    id: string;
+    name: string;
+    subName: string;
+    duration: string;
+    price: Record<Currency, string>;
+    priceNumeric: Record<Currency, number>;
+    paypalPlanId: string;
+    chargelyUrl: string;
+    features: string[];
+    popular: boolean;
+}
+
 export default function PricingPage() {
     const { t, isRTL } = useLanguage();
     const tp = t.pricing;
     const [currency, setCurrency] = useState<Currency>('dzd');
     const [hoveredPlan, setHoveredPlan] = useState<string | null>(null);
 
-    // Intake modal state
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedPlan, setSelectedPlan] = useState<any>(null);
+    const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
 
     const currencyLabel: Record<Currency, string> = {
         dzd: 'DZD',
@@ -91,7 +103,7 @@ export default function PricingPage() {
         },
     ];
 
-    const openModal = (plan: any) => {
+    const openModal = (plan: Plan) => {
         setSelectedPlan(plan);
         setIsModalOpen(true);
     };
