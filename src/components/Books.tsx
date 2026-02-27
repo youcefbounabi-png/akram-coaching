@@ -253,6 +253,13 @@ function BookCheckoutFlow({ book, isRTL, t, onClose }: { book: any, isRTL: boole
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({ name: '', email: '' });
 
+    // Proactively wake up backend when user decides to buy, just in case
+    React.useEffect(() => {
+        if (showForm) {
+            fetch('https://akram-coaching.onrender.com/api/health').catch(() => { });
+        }
+    }, [showForm]);
+
     const priceNumeric = parseInt(book.price.replace(/[^0-9]/g, ''), 10);
 
     const handleChargilyPay = async (e: React.FormEvent) => {

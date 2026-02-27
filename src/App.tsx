@@ -40,6 +40,10 @@ function AppLayout() {
   const isAdmin = pathname === '/admin';
 
   useEffect(() => {
+    // Proactively wake up the Render backend server to reduce cold-start delays
+    fetch('https://akram-coaching.onrender.com/api/health')
+      .catch(() => { /* Silent fail */ });
+
     // Track site visits (exclude admin)
     if (!isAdmin) {
       supabase.from('site_visits').insert([{ page_path: pathname }])
