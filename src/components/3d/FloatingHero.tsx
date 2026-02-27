@@ -179,7 +179,7 @@ const FloatingHero = memo(function FloatingHero({ isRTL = false }: { isRTL?: boo
           <ChiseledCrystal />
         </group>
 
-        <Environment preset="city" />
+        <Environment files={['/potsdamer_platz_1k.hdr']} />
       </Canvas>
     </div>
   );

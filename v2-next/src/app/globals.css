@@ -1,0 +1,173 @@
+@import "tailwindcss";
+
+@source "../src";
+
+@theme {
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display), sans-serif;
+  --font-serif: var(--font-serif), serif;
+
+  --color-brand-red: #ec3642;
+  --color-brand-dark: #050505;
+  --color-brand-gray: #121212;
+}
+
+@layer base {
+  body {
+    @apply bg-brand-dark text-white selection:bg-brand-red selection:text-white overflow-x-hidden;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/* ─── Arabic / RTL Typography ─────────────────────────────────────────────────
+   Arabic is a connected script. Any letter-spacing (positive or negative) breaks
+   the ligatures and makes words look squished or disconnected. Reset it globally
+   for every element inside an RTL container, and add gentle word-spacing so
+   individual words have breathing room.
+   This single rule covers ALL pages and ALL components automatically.
+────────────────────────────────────────────────────────────────────────────── */
+[dir="rtl"],
+[dir="rtl"] * {
+  letter-spacing: 0 !important;
+  word-spacing: 0.06em;
+  font-feature-settings: normal;
+}
+
+/* Headings need a touch more word-spacing to compensate for their large size */
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
+[dir="rtl"] h5,
+[dir="rtl"] h6 {
+  word-spacing: 0.1em;
+  line-height: 1.25;
+}
+
+/* Badge / tag labels — these often have tracking-[0.2em] which is severe in Arabic */
+[dir="rtl"] .uppercase {
+  letter-spacing: 0 !important;
+  word-spacing: 0.08em;
+}
+
+.glass-panel {
+  @apply bg-white/[0.02] backdrop-blur-xl border border-white/[0.05] shadow-[0_8px_32px_0_#0000004d];
+}
+
+.glass-panel-hover {
+  @apply hover:bg-white/[0.04] hover:border-white/[0.1] hover:shadow-[0_8px_32px_0_#ec36421a] transition-all duration-500;
+}
+
+/* Holographic Panel */
+.holo-panel {
+  @apply bg-brand-red/[0.02] backdrop-blur-md border border-brand-red/30;
+  box-shadow: 0 0 30px rgba(236, 54, 66, 0.15), inset 0 0 20px rgba(236, 54, 66, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.holo-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg,
+      transparent,
+      transparent 2px,
+      rgba(236, 54, 66, 0.15) 2px,
+      rgba(236, 54, 66, 0.15) 4px);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.holo-panel::after {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: -100%;
+  width: 300%;
+  height: 300%;
+  background: linear-gradient(to bottom, transparent, rgba(236, 54, 66, 0.2), transparent);
+  transform: rotate(45deg);
+  animation: holo-scan 4s linear infinite;
+  pointer-events: none;
+  z-index: 11;
+}
+
+@keyframes holo-scan {
+  0% {
+    transform: translateY(-50%) rotate(45deg);
+  }
+
+  100% {
+    transform: translateY(50%) rotate(45deg);
+  }
+}
+
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-white via-white/90 to-white/50;
+}
+
+.red-glow {
+  box-shadow: 0 0 30px rgba(236, 54, 66, 0.3);
+}
+
+.red-glow-strong {
+  box-shadow: 0 0 50px rgba(236, 54, 66, 0.5), inset 0 0 20px rgba(236, 54, 66, 0.2);
+}
+
+.ambient-glow {
+  background: radial-gradient(circle at 50% 50%, rgba(236, 54, 66, 0.15) 0%, transparent 60%);
+  filter: blur(60px);
+  /* GPU-promote to own compositor layer — prevents re-rasterizing the blur
+     on every frame alongside the WebGL canvases */
+  will-change: transform;
+  transform: translateZ(0);
+  contain: strict;
+}
+
+.text-glow {
+  text-shadow: 0 0 20px rgba(236, 54, 66, 0.5);
+}
+
+/* Animations */
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-brand-dark;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-white/20 rounded-full hover:bg-brand-red transition-colors;
+}
