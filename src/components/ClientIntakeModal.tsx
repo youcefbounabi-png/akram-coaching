@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, ChevronRight, ChevronLeft, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
 import { PayPalButtons } from "@paypal/react-paypal-js";
@@ -227,6 +227,13 @@ export default function ClientIntakeModal({
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [intakeId, setIntakeId] = useState<string | number | null>(null);
     const [paymentStatus, setPaymentStatus] = useState<'unpaid' | 'paid'>('unpaid');
+
+    // Proactively wake up backend when user decides to start the intake form
+    React.useEffect(() => {
+        if (isOpen) {
+            fetch('https://akram-coaching.onrender.com/api/health').catch(() => { });
+        }
+    }, [isOpen]);
 
     const ti = t.intake;
     const STEPS = [ti.step1, ti.step2, ti.step3];
