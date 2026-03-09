@@ -20,7 +20,7 @@ export default function Books({ variant = 'section' }: BooksProps) {
     const [activeBook, setActiveBook] = useState<number | null>(null);
     const [isHovered, setIsHovered] = useState(false);
 
-    // Lock body scroll when modal is open
+    // Lock ONLY the page scroll (not inner modal scroll) when modal is open
     useEffect(() => {
         if (activeBook !== null) {
             document.body.style.overflow = 'hidden';
@@ -197,8 +197,8 @@ export default function Books({ variant = 'section' }: BooksProps) {
             <section ref={containerRef} id="e-books" className="h-[300vh] relative bg-brand-dark" dir={isRTL ? 'rtl' : 'ltr'}>
                 <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center">
 
-                    {/* Global Vignette */}
-                    <div className="absolute inset-0 z-20 pointer-events-none shadow-[inset_0_0_150px_rgba(5,5,5,1)]" />
+                    {/* Global Vignette — light fade on sides */}
+                    <div className="absolute inset-0 z-20 pointer-events-none shadow-[inset_0_0_100px_rgba(5,5,5,0.3)]" />
 
                     {/* Horizontal Scroll Track */}
                     <motion.div
@@ -311,32 +311,33 @@ export default function Books({ variant = 'section' }: BooksProps) {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/95 backdrop-blur-3xl relative"
+                            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/95 backdrop-blur-3xl"
                             onClick={() => setActiveBook(null)}
+                            data-lenis-prevent
                         >
-                            {/* X button — sits at top-right of the overlay, not inside overflow-hidden */}
-                            <button
-                                onClick={(e) => { e.stopPropagation(); setActiveBook(null); }}
-                                className="absolute top-4 right-4 z-[200] w-12 h-12 md:w-10 md:h-10 rounded-full bg-[#1a1a1a] border-2 border-white/40 text-white flex items-center justify-center hover:bg-brand-red hover:border-brand-red transition-all cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.9)]"
-                                aria-label="Close modal"
-                            >
-                                <X size={22} strokeWidth={2.5} />
-                            </button>
                             <motion.div
                                 initial={{ scale: 0.95, opacity: 0, y: 20 }}
                                 animate={{ scale: 1, opacity: 1, y: 0 }}
                                 exit={{ scale: 0.95, opacity: 0 }}
                                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                                 onClick={(e) => e.stopPropagation()}
-                                className="relative w-full max-w-6xl glass-panel rounded-[2rem] overflow-hidden flex flex-col md:flex-row max-h-[95vh] border border-white/10 shadow-[0_0_100px_rgba(236,54,66,0.15)]"
+                                className="relative w-full max-w-6xl glass-panel rounded-[2rem] flex flex-col md:flex-row max-h-[95vh] border border-white/10 shadow-[0_0_100px_rgba(236,54,66,0.15)]"
                             >
+                                {/* X button — absolute inside panel, panel has no overflow-hidden so it won't be clipped */}
+                                <button
+                                    onClick={() => setActiveBook(null)}
+                                    className="absolute top-4 right-4 z-[50] w-12 h-12 rounded-full bg-[#1a1a1a] border-2 border-white/40 text-white flex items-center justify-center hover:bg-brand-red hover:border-brand-red transition-all cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.9)]"
+                                    aria-label="Close modal"
+                                >
+                                    <X size={22} strokeWidth={2.5} />
+                                </button>
                                 <div className="w-full md:w-[45%] h-[35vh] md:h-auto shrink-0 relative flex items-center justify-center bg-[#050505] overflow-hidden group">
                                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] blur-[120px] pointer-events-none opacity-60" style={{ backgroundColor: books[activeBook].glow }} />
                                     <img src={books[activeBook].image} alt={books[activeBook].title} loading="eager" className="w-[75%] h-auto object-contain relative z-10 drop-shadow-[0_40px_80px_rgba(0,0,0,0.9)] transform transition-transform duration-1000 group-hover:scale-110 group-hover:rotate-3" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-20 md:hidden" />
                                 </div>
 
-                                <div className="w-full md:w-[55%] p-5 md:p-10 lg:p-14 flex flex-col justify-start bg-gradient-to-br from-[#0a0a0a] to-[#111] h-[65vh] md:h-[80vh] overflow-y-auto hide-scrollbar relative">
+                                <div className="w-full md:w-[55%] p-5 md:p-10 lg:p-14 flex flex-col justify-start bg-gradient-to-br from-[#0a0a0a] to-[#111] h-[65vh] md:h-[80vh] overflow-y-auto hide-scrollbar relative" data-lenis-prevent>
                                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-red/30 text-[9px] font-bold uppercase tracking-[0.2em] text-brand-red mb-4 w-fit bg-brand-red/5">
                                         <BookOpen size={10} /> {isRTL ? 'تفاصيل الكتاب' : 'Book Details'}
                                     </div>
