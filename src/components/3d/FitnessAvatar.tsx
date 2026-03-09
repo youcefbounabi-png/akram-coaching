@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Sphere, Capsule, MeshDistortMaterial, Float } from '@react-three/drei';
+import { Sphere, Capsule, MeshDistortMaterial, Float, Preload } from '@react-three/drei';
 import * as THREE from 'three';
 
 function AvatarModel() {
@@ -84,6 +84,7 @@ export default function FitnessAvatar() {
         <pointLight position={[10, 10, 10]} intensity={1} color="#ec3642" />
         <pointLight position={[-10, -10, -10]} intensity={0.5} color="#ffffff" />
         <AvatarModel />
+        <Preload all />
       </Canvas>
     </div>
   );

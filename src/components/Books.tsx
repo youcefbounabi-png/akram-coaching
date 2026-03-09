@@ -1,22 +1,35 @@
 import React, { useRef, useState } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
-import { BookOpen, ArrowRight, ShoppingCart, Info, X, MessageCircle } from 'lucide-react';
+import { BookOpen, ShoppingCart, Info, X, MessageCircle, Truck } from 'lucide-react';
+import { Canvas } from '@react-three/fiber';
+import { Environment, Float, PresentationControls, ContactShadows } from '@react-three/drei';
+import * as THREE from 'three';
+import ImmersiveCTA from './ui/ImmersiveCTA';
 import { useLanguage } from '../i18n/LanguageContext';
 import { cn } from '../lib/utils';
-import { BRAND } from '../constants';
+import { BRAND, ALGERIAN_STATES } from '../constants';
 
-export default function Books() {
+interface BooksProps {
+    variant?: 'section' | 'full';
+}
+
+export default function Books({ variant = 'section' }: BooksProps) {
     const { t, isRTL } = useLanguage();
     const tb = t.books;
     const containerRef = useRef<HTMLDivElement>(null);
     const [activeBook, setActiveBook] = useState<number | null>(null);
+    const [isHovered, setIsHovered] = useState(false);
 
     const { scrollYProgress } = useScroll({
         target: containerRef,
-        offset: ["start end", "end start"]
+        offset: ["start start", "end end"]
     });
 
-    const y = useTransform(scrollYProgress, [0, 1], ["20%", "-20%"]);
+    // 3 books = 300vw total width
+    const xTransform = useTransform(scrollYProgress, [0, 1], ["0%", isRTL ? "66.66%" : "-66.66%"]);
+
+    // Parallax background text
+    const bgTextX = useTransform(scrollYProgress, [0, 1], ["0%", isRTL ? "-20%" : "20%"]);
 
     const books = [
         {
@@ -26,8 +39,7 @@ export default function Books() {
             price: tb.b1Price,
             originalPrice: tb.b1OriginalPrice,
             image: "/books/book-1.png",
-            color: "from-brand-red/20 to-transparent",
-            delay: 0
+            glow: "rgba(236,54,66,0.3)"
         },
         {
             title: tb.b2Title,
@@ -35,9 +47,9 @@ export default function Books() {
             longDesc: tb.b2LongDesc,
             price: tb.b2Price,
             originalPrice: tb.b2OriginalPrice,
-            image: "/books/book-2.png",
-            color: "from-white/10 to-transparent",
-            delay: 0.1
+            image: "/books/newbook (1).png",
+            glow: "rgba(255,255,255,0.15)",
+            scale: 0.93
         },
         {
             title: tb.b3Title,
@@ -45,203 +57,311 @@ export default function Books() {
             longDesc: tb.b3LongDesc,
             price: tb.b3Price,
             originalPrice: tb.b3OriginalPrice,
-            image: "/books/book-3.png",
-            color: "from-brand-red/10 to-transparent",
-            delay: 0.2
+            image: "/books/newbook (2).png",
+            glow: "rgba(236,54,66,0.15)",
+            scale: 0.93
         }
     ];
 
-    const getWhatsappLink = (book: typeof books[0]) => {
-        const msg = encodeURIComponent(`Hello Coach Akram! I would like to purchase the e-book: "${book.title}" for ${book.price}. How can I proceed with the payment?`);
-        return `https://wa.me/${BRAND.socials.whatsapp.replace(/[^0-9]/g, '')}?text=${msg}`;
-    };
-
     return (
-        <section ref={containerRef} id="e-books" className="py-32 relative overflow-hidden bg-brand-dark" dir={isRTL ? 'rtl' : 'ltr'}>
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-brand-red/20 to-transparent" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] pointer-events-none mix-blend-overlay" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-red/10 rounded-full blur-[150px] pointer-events-none" />
+        <>
+            {/* ── Books Hero Decision ─────────────────────────────────── */}
+            {variant === 'full' ? (
+                <section className="relative h-[85vh] w-full overflow-hidden bg-brand-dark" id="books-3d-hero">
+                    {/* Background Image with Overlay */}
+                    <div
+                        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000"
+                        style={{
+                            backgroundImage: "url('/books/books-hero-bg.png')",
+                            filter: "brightness(0.6)"
+                        }}
+                    />
 
-            <div className="container max-w-7xl mx-auto px-6 relative z-10">
-                <div className="flex flex-col md:flex-row items-end justify-between mb-24 gap-8">
+                    {/* Nebula Background Effect */}
+                    <div className="absolute inset-0 z-5 overflow-hidden pointer-events-none">
+                        <motion.div
+                            animate={{
+                                scale: [1, 1.2, 1],
+                                rotate: [0, 90, 0],
+                                x: [0, 100, 0],
+                                y: [0, -50, 0]
+                            }}
+                            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                            className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-brand-red/20 rounded-full blur-[120px] opacity-30"
+                        />
+                        <motion.div
+                            animate={{
+                                scale: [1, 1.3, 1],
+                                rotate: [0, -45, 0],
+                                x: [0, -120, 0],
+                                y: [0, 80, 0]
+                            }}
+                            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                            className="absolute bottom-[-15%] right-[-5%] w-[50%] h-[50%] bg-white/5 rounded-full blur-[100px] opacity-20"
+                        />
+                        <motion.div
+                            animate={{
+                                scale: [1, 1.1, 1],
+                                x: [0, 50, 0],
+                                y: [0, 100, 0]
+                            }}
+                            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                            className="absolute top-[20%] right-[10%] w-[30%] h-[30%] bg-brand-red/10 rounded-full blur-[150px] opacity-20"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brand-dark/20 to-brand-dark" />
+                    </div>
+
+                    {/* Overlay content - immediately visible without 3D loading */}
                     <motion.div
-                        initial={{ opacity: 0, x: -40 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8 }}
-                        className="max-w-2xl"
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                        className="absolute inset-0 z-20 flex flex-col items-center justify-center px-6 pointer-events-none pt-20"
+                        dir={isRTL ? 'rtl' : 'ltr'}
                     >
-                        <p className="text-xs font-bold text-brand-red uppercase tracking-[0.3em] mb-4 flex items-center gap-4">
+                        <div className="max-w-5xl mx-auto text-center mt-auto pb-12">
+                            <p className="text-[10px] font-bold text-brand-red uppercase tracking-[0.4em] mb-4 flex items-center justify-center gap-4">
+                                <span className="w-10 h-px bg-brand-red" />
+                                {tb.tagline || 'Exclusive Collection'}
+                                <span className="w-10 h-px bg-brand-red" />
+                            </p>
+                            <h2 className="text-5xl md:text-7xl lg:text-8xl font-display font-black text-white leading-tight mb-4 drop-shadow-2xl">
+                                {tb.headline || 'Premium Books'}
+                            </h2>
+                            <p className="text-white/70 text-base md:text-xl font-light max-w-2xl mx-auto mb-10 drop-shadow-md">
+                                {tb.subtitle || 'Explore our handcrafted collection of physical guidebooks.'}
+                            </p>
+                            <motion.div
+                                animate={{ y: [0, 8, 0] }}
+                                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                                className="text-white/50"
+                            >
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="mx-auto"><path d="M12 5V19M12 19L5 12M12 19L19 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                            </motion.div>
+                        </div>
+                    </motion.div>
+                </section>
+            ) : (
+                <section
+                    className="pt-24 pb-12 relative overflow-hidden bg-brand-dark"
+                    id="books-simple-header"
+                    style={{
+                        maskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)',
+                        WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)'
+                    }}
+                >
+                    <div className="container max-w-7xl mx-auto px-6 relative z-10 text-center">
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="text-xs font-bold text-brand-red uppercase tracking-[0.3em] mb-4 flex items-center justify-center gap-4"
+                        >
                             <span className="w-8 h-px bg-brand-red" />
                             {tb.tagline}
-                        </p>
-                        <h2 className="text-4xl sm:text-5xl md:text-7xl lg:text-[6rem] font-display font-black tracking-tighter leading-none mb-6 uppercase">
-                            {tb.headline} <br />
-                            <span className="font-serif italic font-light text-brand-red lowercase tracking-normal text-glow">{tb.headlineItalic}</span>
-                        </h2>
-                    </motion.div>
-
-                    <motion.div
-                        initial={{ opacity: 0, x: 40 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                        className="max-w-md"
-                    >
-                        <p className="text-white/60 text-lg font-light leading-relaxed border-l-2 border-brand-red/30 pl-6">
-                            {tb.subtitle}
-                        </p>
-                    </motion.div>
-                </div>
-
-                {/* Mobile: Horizontal scroll snapping sequence. Desktop: 3-column grid */}
-                <div className="flex overflow-x-auto snap-x snap-mandatory lg:grid lg:grid-cols-3 gap-6 md:gap-12 perspective-1000 pb-12 -mx-6 px-6 lg:mx-0 lg:px-0 hide-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    {books.map((book, i) => (
-                        <motion.div
-                            key={i}
-                            initial={{ opacity: 0, y: 50, rotateX: 10, scale: 0.9 }}
-                            whileInView={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
-                            transition={{ duration: 0.8, delay: book.delay, type: 'spring', stiffness: 100 }}
-                            viewport={{ once: true, margin: "-50px" }}
-                            className="group relative h-full flex flex-col shrink-0 snap-center w-[85vw] sm:w-[320px] lg:w-auto"
+                            <span className="w-8 h-px bg-brand-red" />
+                        </motion.p>
+                        <motion.h2
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 }}
+                            viewport={{ once: true }}
+                            className="text-4xl md:text-6xl lg:text-7xl font-display font-black tracking-tighter leading-none mb-6"
                         >
-                            {/* Glow Effect */}
-                            <div className="absolute -inset-1 bg-gradient-to-b opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-[2.5rem] blur-xl will-change-transform z-0" style={{ backgroundImage: `var(--tw-gradient-stops)` }} />
+                            {tb.headline} <span className="font-serif italic font-light text-brand-red">{tb.headlineItalic}</span>
+                        </motion.h2>
+                        <motion.p
+                            initial={{ opacity: 0 }}
+                            whileInView={{ opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                            viewport={{ once: true }}
+                            className="text-white/50 text-lg md:text-xl font-light max-w-2xl mx-auto"
+                        >
+                            {tb.subtitle}
+                        </motion.p>
+                    </div>
+                </section>
+            )}
 
-                            <div className={cn(
-                                "relative glass-panel rounded-[2rem] h-full flex flex-col border border-white/10 overflow-hidden bg-gradient-to-b transition-all duration-500 z-10",
-                                book.color,
-                                "hover:border-brand-red/40 hover:-translate-y-4 hover:shadow-[0_20px_40px_-20px_rgba(236,54,66,0.3)]"
-                            )}>
+            {/* ── Horizontal Parallax Book Slides ─────────────────────── */}
+            <section ref={containerRef} id="e-books" className="h-[300vh] relative bg-brand-dark" dir={isRTL ? 'rtl' : 'ltr'}>
+                <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center">
 
-                                {/* Image Container */}
-                                <div className="relative w-full aspect-[4/5] overflow-hidden bg-black/50">
-                                    <motion.img
-                                        whileHover={{ scale: 1.1, rotateZ: isRTL ? -2 : 2 }}
-                                        transition={{ duration: 0.7, ease: "easeOut" }}
-                                        src={book.image}
-                                        alt={book.title}
-                                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
+                    {/* Global Vignette */}
+                    <div className="absolute inset-0 z-20 pointer-events-none shadow-[inset_0_0_150px_rgba(5,5,5,1)]" />
 
-                                    <div className="absolute top-4 left-4 right-4 flex justify-between items-start z-20">
-                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/10 text-[10px] font-bold uppercase tracking-widest text-brand-red">
-                                            <BookOpen size={12} /> {isRTL ? 'كتاب إلكتروني' : 'E-BOOK'}
-                                        </div>
-                                        <button
-                                            onClick={() => setActiveBook(i)}
-                                            className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-brand-red hover:border-brand-red transition-colors cursor-pointer active:scale-95"
-                                            aria-label="View details"
-                                        >
-                                            <Info size={14} />
-                                        </button>
-                                    </div>
+                    {/* Horizontal Scroll Track */}
+                    <motion.div
+                        style={{ x: xTransform, willChange: 'transform' }}
+                        className="flex h-full w-[300vw] relative z-10"
+                    >
+                        {books.map((book, i) => (
+                            <div key={i} className="w-[100vw] h-screen flex items-center justify-center relative px-4 md:px-12 shrink-0">
 
-                                    <div className="absolute bottom-6 left-6 right-6 z-20">
-                                        <h3 className="text-2xl md:text-3xl font-display font-black leading-tight text-white group-hover:text-brand-red transition-colors duration-300 drop-shadow-lg">
-                                            {book.title}
-                                        </h3>
-                                    </div>
-                                </div>
+                                {/* Giant Parallax Background Typography - Hide on mobile for performance */}
+                                <motion.div
+                                    className="hidden md:block absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 text-[15vw] md:text-[12vw] font-display font-black uppercase text-transparent whitespace-nowrap pointer-events-none opacity-20"
+                                    style={{
+                                        WebkitTextStroke: '2px rgba(255,255,255,0.15)',
+                                        x: bgTextX,
+                                        paddingLeft: isRTL ? 0 : `${i * 30}vw`,
+                                        paddingRight: isRTL ? `${i * 30}vw` : 0
+                                    }}
+                                >
+                                    {book.title}
+                                </motion.div>
 
-                                {/* Content Container */}
-                                <div className="p-6 md:p-8 flex-1 flex flex-col items-start text-start relative bg-brand-dark/40 backdrop-blur-sm">
-                                    <p className="text-white/60 text-sm font-light leading-relaxed mb-8 flex-1">
-                                        {book.desc}
-                                    </p>
+                                {/* ── Book + Info Panel (tightly coupled) ── */}
+                                <div className="w-full max-w-5xl mx-auto relative z-30 h-full flex items-center py-16">
 
-                                    <div className="w-full space-y-4 border-t border-white/10 pt-4 mt-auto">
-                                        <div className="flex items-end justify-between pb-2">
-                                            <div className="text-xs uppercase tracking-widest text-white/40 font-bold">Investment</div>
-                                            <div className="flex flex-col items-end">
-                                                <span className="text-sm text-white/40 line-through decoration-brand-red/50 decoration-2 font-bold mb-0.5">{book.originalPrice}</span>
-                                                <div className="text-3xl font-display font-black text-white leading-none">{book.price}</div>
+                                    {/* The glass panel is the main container */}
+                                    <div
+                                        className={cn(
+                                            "w-full glass-panel p-6 md:p-10 lg:p-12 rounded-[2rem] relative overflow-visible",
+                                            isRTL ? "md:mr-0 md:ml-auto md:w-[65%] md:pr-12" : "md:ml-0 md:mr-auto md:w-[65%] md:pl-12"
+                                        )}
+                                        style={{ backdropFilter: 'blur(20px)' }}
+                                    >
+                                        {/* Book Image — absolutely positioned, overlapping the panel edge */}
+                                        <div className={cn(
+                                            "hidden md:flex items-center justify-center absolute top-1/2 -translate-y-1/2 z-40",
+                                            isRTL ? "-left-[240px] lg:-left-[300px] xl:-left-[340px]" : "-right-[240px] lg:-right-[300px] xl:-right-[340px]"
+                                        )}>
+                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[400px] md:h-[400px] blur-[80px] md:blur-[120px] rounded-full pointer-events-none opacity-60 md:opacity-100" style={{ backgroundColor: book.glow }} />
+
+                                            <div
+                                                className="relative w-[260px] lg:w-[320px] xl:w-[340px] animate-float cursor-pointer group"
+                                                style={{ scale: (book as any).scale || 1 }}
+                                                onClick={() => setActiveBook(i)}
+                                            >
+                                                <img
+                                                    src={book.image}
+                                                    alt={book.title}
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                    className="w-full h-auto rounded-lg shadow-[0_40px_80px_rgba(0,0,0,0.8),_0_0_40px_rgba(255,255,255,0.1)] transition-transform duration-700 group-hover:scale-105"
+                                                />
+                                                {/* Hover overlay */}
+                                                <div className="absolute inset-0 rounded-lg bg-white/0 group-hover:bg-white/5 transition-colors duration-500 flex items-center justify-center ring-1 ring-white/10 group-hover:ring-white/30">
+                                                    <div className="w-16 h-16 rounded-full bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300 scale-75 group-hover:scale-100">
+                                                        <Info size={24} />
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
-                                        <button
-                                            onClick={() => setActiveBook(i)}
-                                            className="w-full py-4 rounded-xl font-bold tracking-widest uppercase text-center transition-all duration-300 active:scale-95 bg-brand-red text-white hover:bg-red-600 red-glow flex items-center justify-center gap-3 group/btn cursor-pointer"
-                                        >
-                                            <ShoppingCart size={18} />
-                                            {tb.cta}
-                                            <ArrowRight size={18} className={cn("transition-transform group-hover/btn:translate-x-1", isRTL && "rotate-180 group-hover/btn:-translate-x-1")} />
-                                        </button>
+                                        {/* Mobile: Book image inline above the text */}
+                                        <div className="flex md:hidden items-center justify-center mb-6">
+                                            <div className="relative w-[180px] cursor-pointer group" style={{ scale: (book as any).scale || 1 }} onClick={() => setActiveBook(i)}>
+                                                <img src={book.image} alt={book.title} loading="lazy" decoding="async" className="w-full h-auto rounded-lg shadow-[0_30px_60px_rgba(0,0,0,0.7),_0_0_20px_rgba(255,255,255,0.1)] ring-1 ring-white/5" />
+                                            </div>
+                                        </div>
+                                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/20 text-[9px] font-bold uppercase tracking-[0.2em] text-white/60 mb-3 w-fit bg-white/5">
+                                            <BookOpen size={10} className="text-brand-red" /> {isRTL ? 'كتاب مطبوع' : 'Premium Physical Book'}
+                                        </div>
+
+                                        <h3 className="text-2xl md:text-4xl lg:text-5xl font-display font-black leading-tight text-white mb-3 drop-shadow-lg">
+                                            {book.title}
+                                        </h3>
+
+                                        <p className="text-white/60 text-xs md:text-base font-light leading-relaxed mb-6">
+                                            {book.desc}
+                                        </p>
+
+                                        <div className="flex flex-col sm:flex-row items-center gap-4 justify-between pt-5 border-t border-white/10">
+                                            <div className="flex flex-row sm:flex-col items-baseline sm:items-start justify-between sm:justify-center w-full sm:w-auto gap-3">
+                                                <span className="text-[10px] uppercase tracking-[0.2em] text-brand-red font-bold mb-1">Investment</span>
+                                                <div className="text-3xl lg:text-4xl font-display font-black text-white leading-none drop-shadow-md">{book.price}</div>
+                                                {book.originalPrice && (
+                                                    <span className="text-sm text-white/30 line-through decoration-brand-red/50 decoration-2 font-medium mt-1">{book.originalPrice}</span>
+                                                )}
+                                            </div>
+
+                                            <button
+                                                onClick={() => setActiveBook(i)}
+                                                className="w-full sm:w-auto px-7 py-4 rounded-full font-bold tracking-[0.2em] uppercase text-xs transition-all duration-500 bg-brand-red text-white hover:bg-red-600 red-glow-strong flex items-center justify-center gap-3 cursor-pointer group hover:scale-105 active:scale-95 border border-red-500/50"
+                                            >
+                                                <ShoppingCart size={16} />
+                                                {tb.cta}
+                                            </button>
+                                        </div>
                                     </div>
+
                                 </div>
                             </div>
-                        </motion.div>
-                    ))}
+                        ))}
+                    </motion.div>
+
                 </div>
 
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="mt-24 text-center"
-                >
-                    <a href={BRAND.socials.whatsapp} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-3 glass-panel glass-panel-hover px-10 py-5 rounded-full font-bold text-lg cursor-pointer group">
-                        {isRTL ? 'لديك أسئلة؟ تواصل معنا' : 'Questions? Contact Us'}
-                        <ArrowRight size={20} className={cn("text-brand-red transition-transform", isRTL ? "group-hover:-translate-x-1 rotate-180" : "group-hover:translate-x-1")} />
-                    </a>
-                </motion.div>
-            </div>
-
-            {/* Quick View Modal */}
-            <AnimatePresence>
-                {activeBook !== null && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-lg"
-                        onClick={() => setActiveBook(null)}
-                    >
+                {/* Quick View & Checkout Modal */}
+                <AnimatePresence>
+                    {activeBook !== null && (
                         <motion.div
-                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                            animate={{ scale: 1, opacity: 1, y: 0 }}
-                            exit={{ scale: 0.95, opacity: 0 }}
-                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            onClick={(e) => e.stopPropagation()}
-                            className="relative w-full max-w-4xl glass-panel rounded-[2rem] overflow-hidden flex flex-col md:flex-row border border-white/10 max-h-[90vh] md:max-h-[85vh]"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/95 backdrop-blur-3xl"
+                            onClick={() => setActiveBook(null)}
                         >
-                            {/* X Close Button - Now inside the card with standard z-50 */}
-                            <button
-                                onClick={() => setActiveBook(null)}
-                                className={cn(
-                                    "absolute top-4 md:top-6 z-50 w-10 h-10 md:w-12 md:h-12 rounded-full bg-brand-red text-white flex items-center justify-center shadow-[0_0_20px_rgba(236,54,66,0.4)] hover:scale-110 hover:bg-red-600 transition-all cursor-pointer",
-                                    isRTL ? "left-4 md:left-6" : "right-4 md:right-6"
-                                )}
-                                aria-label="Close modal"
+                            <motion.div
+                                initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                                animate={{ scale: 1, opacity: 1, y: 0 }}
+                                exit={{ scale: 0.95, opacity: 0 }}
+                                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                                onClick={(e) => e.stopPropagation()}
+                                className="relative w-full max-w-6xl glass-panel rounded-[2rem] overflow-hidden flex flex-col md:flex-row max-h-[95vh] border border-white/10 shadow-[0_0_100px_rgba(236,54,66,0.15)]"
                             >
-                                <X size={20} />
-                            </button>
+                                <button
+                                    onClick={() => setActiveBook(null)}
+                                    className={cn(
+                                        "absolute top-4 md:top-6 z-50 w-12 h-12 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white flex items-center justify-center hover:bg-brand-red hover:border-brand-red transition-all cursor-pointer",
+                                        isRTL ? "left-4 md:left-6" : "right-4 md:right-6"
+                                    )}
+                                    aria-label="Close modal"
+                                >
+                                    <X size={20} />
+                                </button>
 
-                            <div className="w-full md:w-1/2 md:aspect-auto h-[35vh] md:h-auto shrink-0 relative">
-                                <img src={books[activeBook].image} alt={books[activeBook].title} className="w-full h-full object-cover" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-transparent md:hidden" />
-                            </div>
-
-                            <div className="w-full md:w-1/2 p-6 md:p-12 flex flex-col justify-start bg-brand-dark/90 h-[55vh] md:h-[600px] overflow-y-auto hide-scrollbar">
-                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-red/10 border border-brand-red/20 text-xs font-bold uppercase tracking-widest text-brand-red mb-4 md:mb-6 w-fit shrink-0">
-                                    <BookOpen size={14} /> {isRTL ? 'عرض لفترة محدودة' : 'limited time offer'}
+                                <div className="w-full md:w-[45%] h-[35vh] md:h-auto shrink-0 relative flex items-center justify-center bg-[#050505] overflow-hidden group">
+                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] blur-[120px] pointer-events-none opacity-60" style={{ backgroundColor: books[activeBook].glow }} />
+                                    <img src={books[activeBook].image} alt={books[activeBook].title} loading="eager" className="w-[75%] h-auto object-contain relative z-10 drop-shadow-[0_40px_80px_rgba(0,0,0,0.9)] transform transition-transform duration-1000 group-hover:scale-110 group-hover:rotate-3" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-20 md:hidden" />
                                 </div>
-                                <h3 className="text-3xl md:text-5xl font-display font-black mb-4 leading-tight shrink-0">{books[activeBook].title}</h3>
 
-                                {/* Checkout Form State */}
-                                <BookCheckoutFlow
-                                    book={books[activeBook]}
-                                    isRTL={isRTL}
-                                    t={tb}
-                                    onClose={() => setActiveBook(null)}
-                                />
-                            </div>
+                                <div className="w-full md:w-[55%] p-5 md:p-10 lg:p-14 flex flex-col justify-start bg-gradient-to-br from-[#0a0a0a] to-[#111] h-[65vh] md:h-[80vh] overflow-y-auto hide-scrollbar relative">
+                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-red/30 text-[9px] font-bold uppercase tracking-[0.2em] text-brand-red mb-4 w-fit bg-brand-red/5">
+                                        <BookOpen size={10} /> {isRTL ? 'تفاصيل الكتاب' : 'Book Details'}
+                                    </div>
+                                    <h3 className="text-2xl md:text-4xl lg:text-5xl font-display font-black mb-4 leading-tight text-white drop-shadow-md">{books[activeBook].title}</h3>
+
+                                    <BookCheckoutFlow
+                                        book={books[activeBook]}
+                                        isRTL={isRTL}
+                                        t={tb}
+                                        onClose={() => setActiveBook(null)}
+                                    />
+                                </div>
+                            </motion.div>
                         </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </section>
+                    )}
+                </AnimatePresence>
+            </section>
+
+            {/* Quiet, Immersive Global Books CTA (Only on Books Page) */}
+            {variant === 'full' && (
+                <ImmersiveCTA
+                    title={tb.ctaTitle}
+                    subtitle={tb.ctaSubtitle}
+                    buttonText={tb.ctaButton}
+                    showBeams={false}
+                    onClick={() => {
+                        const el = document.getElementById('e-books');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                />
+            )}
+        </>
     );
 }
 
@@ -250,159 +370,162 @@ export default function Books() {
  */
 function BookCheckoutFlow({ book, isRTL, t, onClose }: { book: any, isRTL: boolean, t: any, onClose: () => void }) {
     const [showForm, setShowForm] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState({ name: '', email: '' });
+    const [formData, setFormData] = useState({
+        firstName: '', lastName: '', phone: '', state: '', district: '', deliveryPref: 'desk', quantity: 1
+    });
 
-    // Proactively wake up backend when user decides to buy, just in case
     React.useEffect(() => {
-        if (showForm) {
-            fetch('https://akram-coaching.onrender.com/api/health').catch(() => { });
-        }
+        if (showForm) fetch('https://akram-coaching.onrender.com/api/health').catch(() => { });
     }, [showForm]);
 
-    const priceNumeric = parseInt(book.price.replace(/[^0-9]/g, ''), 10);
+    const unitPrice = parseInt(book.price.replace(/[^0-9]/g, ''), 10);
+    const totalPrice = unitPrice * formData.quantity;
+
+    const inputCls = "w-full bg-black/40 border border-white/10 focus:border-brand-red focus:bg-white/5 outline-none rounded-xl px-5 py-4 text-white placeholder:text-white/30 text-sm transition-all duration-300 font-light shadow-inner";
 
     const handleChargilyPay = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!formData.name || !formData.email) {
-            alert(isRTL ? 'يرجى ملء جميع الحقول' : 'Please fill in all fields');
-            return;
-        }
-
         setLoading(true);
+        setShowSuccess(true);
+
         try {
             const successParams = new URLSearchParams({
-                method: 'Baridimob',
-                plan: book.title,
-                name: formData.name,
-                email: formData.email,
-                amount: priceNumeric.toString(),
-                currency: 'DZD'
+                method: 'Baridimob', plan: `${book.title} (Qty: ${formData.quantity})`, name: `${formData.firstName} ${formData.lastName}`, email: 'no-email@akram-coaching.com', amount: totalPrice.toString(), currency: 'DZD'
             }).toString();
 
             const res = await fetch('https://akram-coaching.onrender.com/api/chargily/create-checkout', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    amount: priceNumeric,
-                    currency: 'DZD',
-                    planName: book.title,
-                    clientName: formData.name,
-                    clientEmail: formData.email,
-                    successUrl: window.location.origin + '/payment-success?' + successParams,
-                    failureUrl: window.location.origin + '#e-books'
+                    amount: totalPrice, currency: 'DZD', planName: `${book.title} (x${formData.quantity})`, clientName: `${formData.firstName} ${formData.lastName}`, clientEmail: 'no-email@akram-coaching.com', successUrl: window.location.origin + '/payment-success?' + successParams, failureUrl: window.location.origin + '/books'
                 })
             });
 
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Checkout failed');
 
-            window.location.href = data.checkoutUrl;
+            setTimeout(() => { window.location.href = data.checkoutUrl; }, 3000);
         } catch (err) {
             console.error('[Books] Payment Error:', err);
-            alert(isRTL ? 'حدث خطأ أثناء معالجة الدفع' : 'Error processing payment. Please try again.');
-        } finally {
+            setShowSuccess(false);
             setLoading(false);
         }
     };
 
     if (showForm) {
         return (
-            <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-4 space-y-4"
-            >
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                    <p className="text-xs text-brand-red font-bold uppercase tracking-wider mb-4">
-                        {isRTL ? 'معلومات الدفع' : 'Payment Information'}
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 relative flex-1 flex flex-col justify-center">
+                <AnimatePresence>
+                    {showSuccess && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 z-20 flex flex-col items-center justify-center p-8 bg-brand-dark/95 backdrop-blur-xl rounded-3xl text-center border border-brand-red/30 shadow-[0_0_50px_rgba(236,54,66,0.3)]">
+                            <Truck size={48} className="text-brand-red mb-6 animate-bounce drop-shadow-[0_0_15px_rgba(236,54,66,0.6)]" />
+                            <h4 className="text-3xl font-display font-black mb-3 text-white">{t.physicalNotice || 'Physical Delivery'}</h4>
+                            <p className="text-white/70 font-light text-base mb-8 leading-relaxed max-w-sm">
+                                {t.deliveryNotice || 'Will be delivered in 24-48 hours'}
+                            </p>
+                            <div className="flex gap-3 items-center text-xs font-bold text-brand-red uppercase tracking-[0.2em]">
+                                <span className="w-5 h-5 rounded-full border-2 border-brand-red border-t-transparent animate-spin" />
+                                {isRTL ? 'جاري التحويل...' : 'Redirecting...'}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                <form onSubmit={handleChargilyPay} className="space-y-5">
+                    <p className="text-[10px] text-brand-red font-bold uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <span className="w-4 h-px bg-brand-red"></span>
+                        {isRTL ? 'معلومات التوصيل' : 'Delivery Details'}
                     </p>
-                    <form onSubmit={handleChargilyPay} className="space-y-3">
-                        <input
-                            required
-                            type="text"
-                            placeholder={isRTL ? 'الاسم الكامل' : 'Full Name'}
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-sm focus:border-brand-red outline-none transition-colors text-white"
-                        />
-                        <input
-                            required
-                            type="email"
-                            placeholder={isRTL ? 'البريد الإلكتروني' : 'Email Address'}
-                            value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-sm focus:border-brand-red outline-none transition-colors text-white"
-                        />
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full py-4 rounded-xl font-bold text-xs tracking-widest uppercase bg-brand-red text-white hover:bg-red-600 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
-                        >
-                            {loading ? (
-                                <span className="animate-pulse">{isRTL ? 'جاري التحويل...' : 'Redirecting...'}</span>
-                            ) : (
-                                <>
-                                    <ShoppingCart size={16} />
-                                    {isRTL ? 'تأكيد ودفع' : 'Confirm & Pay'}
-                                </>
-                            )}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setShowForm(false)}
-                            className="w-full py-2 text-xs text-white/40 hover:text-white transition-colors cursor-pointer"
-                        >
+                    <div className="grid grid-cols-2 gap-4">
+                        <input required type="text" placeholder={isRTL ? 'الاسم' : 'First Name'} value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} className={inputCls} />
+                        <input required type="text" placeholder={isRTL ? 'اللقب' : 'Last Name'} value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} className={inputCls} />
+                    </div>
+                    <input required type="tel" placeholder={isRTL ? 'رقم الهاتف' : 'Phone Number'} value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className={inputCls} />
+                    <div className="grid grid-cols-2 gap-4">
+                        <select required value={formData.state} onChange={(e) => setFormData({ ...formData, state: e.target.value })} className={cn(inputCls, "appearance-none cursor-pointer text-white/80")}>
+                            <option value="" disabled className="bg-brand-dark">{isRTL ? 'الولاية' : 'State'}</option>
+                            {ALGERIAN_STATES.map(s => <option key={s} value={s} className="bg-brand-dark">{s}</option>)}
+                        </select>
+                        <input required type="text" placeholder={isRTL ? 'البلدية' : 'District'} value={formData.district} onChange={(e) => setFormData({ ...formData, district: e.target.value })} className={inputCls} />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 mt-4">
+                        {['desk', 'home'].map((pref) => (
+                            <button key={pref} type="button" onClick={() => setFormData({ ...formData, deliveryPref: pref })}
+                                className={cn("px-4 py-4 rounded-xl text-xs font-bold tracking-widest uppercase transition-all duration-300 border flex flex-col items-center justify-center gap-2", formData.deliveryPref === pref ? "bg-brand-red/20 border-brand-red text-white red-glow" : "bg-white/5 border-white/10 text-white/50 hover:border-white/30 hover:bg-white/10 hover:text-white")}>
+                                <div className={cn("w-2 h-2 rounded-full", formData.deliveryPref === pref ? "bg-brand-red" : "bg-white/20")} />
+                                {pref === 'desk' ? (t.fields?.deliveryDesk || 'Stop Desk') : (t.fields?.deliveryHome || 'Home Delivery')}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="flex items-center justify-between p-5 bg-black/40 rounded-xl border border-white/10 mt-6 shadow-inner">
+                        <span className="text-xs font-bold text-white/50 uppercase tracking-[0.2em]">{isRTL ? 'الكمية' : 'Quantity'}:</span>
+                        <div className="flex items-center gap-6">
+                            <button type="button" onClick={() => setFormData(f => ({ ...f, quantity: Math.max(1, f.quantity - 1) }))} className="text-white/50 hover:text-brand-red transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/5">-</button>
+                            <span className="font-display text-2xl font-black">{formData.quantity}</span>
+                            <button type="button" onClick={() => setFormData(f => ({ ...f, quantity: f.quantity + 1 }))} className="text-white/50 hover:text-brand-red transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/5">+</button>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-between items-center py-6 border-t border-white/10 mt-6">
+                        <span className="text-xs text-white/50 uppercase tracking-[0.2em] font-bold">{isRTL ? 'المجموع' : 'Total DZD'}</span>
+                        <span className="font-display text-4xl font-black text-brand-red drop-shadow-md">{totalPrice.toLocaleString()}</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                        <button type="button" onClick={() => setShowForm(false)} className="w-full py-4 rounded-xl font-bold tracking-[0.2em] uppercase text-xs transition-all duration-300 bg-white/5 border border-white/10 text-white hover:bg-white/10 cursor-pointer order-2 md:order-1">
                             {isRTL ? 'رجوع' : 'Go Back'}
                         </button>
-                    </form>
-                </div>
+                        <button type="submit" disabled={loading} className="w-full py-4 rounded-xl font-bold tracking-[0.2em] uppercase text-xs transition-all duration-300 bg-brand-red text-white hover:bg-red-600 red-glow-strong disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer order-1 md:order-2">
+                            <ShoppingCart size={16} />
+                            {isRTL ? 'تأكيد' : 'Confirm'}
+                        </button>
+                    </div>
+                </form>
             </motion.div>
         );
     }
 
     return (
-        <>
-            <p className="text-white/80 text-sm md:text-base font-light leading-relaxed mb-6 pl-4 border-l-2 border-brand-red/50 relative z-10">{book.longDesc}</p>
+        <div className="flex flex-col h-full space-y-8">
+            <p className="text-white/70 text-xs md:text-lg font-light leading-relaxed mb-4 border-l-2 border-brand-red/50 pl-6 flex-1 max-h-[25vh] overflow-y-auto pr-4 hide-scrollbar">
+                {book.longDesc}
+            </p>
 
-            <div className="mt-auto pt-6 border-t border-white/10">
-                <div className="flex justify-between items-end mb-6">
-                    <div className="text-sm uppercase tracking-widest text-white/40 font-bold mb-1">Total Investment</div>
-                    <div className="flex items-center gap-3">
-                        <span className="text-lg text-white/30 line-through decoration-brand-red/40 decoration-2 font-bold">{book.originalPrice}</span>
-                        <div className="text-4xl font-display font-black text-brand-red leading-none">{book.price}</div>
+            <div className="mt-auto">
+                <div className="flex justify-between items-end mb-8 pb-8 border-b border-white/10">
+                    <div className="text-[10px] uppercase tracking-[0.3em] text-brand-red font-bold mb-2 flex items-center gap-2">
+                        <span className="w-4 h-px bg-brand-red" />
+                        Total Value
+                    </div>
+                    <div className="flex flex-col items-end">
+                        <span className="text-lg text-white/30 line-through decoration-brand-red/50 decoration-2 font-bold mb-1">{book.originalPrice}</span>
+                        <div className="text-5xl lg:text-6xl font-display font-black text-white leading-none tracking-tighter drop-shadow-lg">{book.price}</div>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-3 pb-8 md:pb-0">
-                    {/* Baridimob / CCP Button */}
+                <div className="space-y-4">
                     <button
                         onClick={() => setShowForm(true)}
-                        className="w-full py-4 rounded-xl font-bold text-xs tracking-widest uppercase text-center transition-all duration-300 active:scale-95 bg-white/5 border border-white/10 hover:bg-white/10 text-white flex items-center justify-center gap-2 cursor-pointer"
+                        className="w-full py-5 rounded-xl font-bold text-sm tracking-[0.2em] uppercase text-center transition-all duration-300 active:scale-95 bg-brand-red text-white hover:bg-red-600 red-glow flex items-center justify-center gap-3 cursor-pointer group"
                     >
-                        <ShoppingCart size={16} />
-                        {t.payBaridi}
+                        <ShoppingCart size={18} className="group-hover:scale-110 transition-transform" />
+                        {t.payBaridi || 'Buy Now (DZD)'}
                     </button>
-                    {/* WhatsApp Direct Buy */}
                     <a
-                        href={`https://wa.me/${BRAND.socials.whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hello Coach Akram! I would like to purchase the e-book: "${book.title}"`)}`}
+                        href={`https://wa.me/${BRAND.socials.whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hello Coach Akram! I'm interested in the premium book: "${book.title}"`)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full py-4 rounded-xl font-bold text-xs tracking-widest uppercase text-center transition-all duration-300 active:scale-95 bg-[#25D366] text-white hover:bg-[#20bd5a] flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(37,211,102,0.3)] mb-2"
+                        className="w-full py-5 rounded-xl font-bold text-sm tracking-[0.2em] uppercase text-center transition-all duration-300 active:scale-95 glass-panel glass-panel-hover text-white flex items-center justify-center gap-3 cursor-pointer group"
                     >
-                        <MessageCircle size={16} />
-                        {t.payWhatsapp}
+                        <MessageCircle size={18} className="text-[#25D366] group-hover:scale-110 transition-transform" />
+                        {isRTL ? 'تواصل معنا' : 'Contact Support'}
                     </a>
-                    {/* Fallback Close Window Button (Always Visible) */}
-                    <button
-                        onClick={onClose}
-                        className="w-full py-4 rounded-xl font-bold text-xs tracking-widest uppercase text-center transition-all duration-300 active:scale-95 bg-white/5 border border-white/10 hover:bg-white/10 text-white flex items-center justify-center gap-2 mt-2 cursor-pointer"
-                    >
-                        <X size={16} />
-                        {isRTL ? 'إغلاق النافذة' : 'Close Window'}
-                    </button>
                 </div>
             </div>
-        </>
+        </div>
     );
 }

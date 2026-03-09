@@ -7,6 +7,7 @@ import { BRAND } from '../constants';
 import { cn } from '../lib/utils';
 import { useLanguage } from '../i18n/LanguageContext';
 import ClientIntakeModal from '../components/ClientIntakeModal';
+import SEO from '../components/SEO';
 
 type Currency = 'dzd' | 'eur' | 'usd';
 
@@ -17,6 +18,7 @@ interface Plan {
     duration: string;
     price: Record<Currency, string>;
     priceNumeric: Record<Currency, number>;
+    originalPrice: Record<Currency, string>;
     paypalPlanId: string;
     chargelyUrl: string;
     features: string[];
@@ -48,6 +50,7 @@ export default function PricingPage() {
             duration: tp.duration2,
             price: { dzd: '18,000', eur: '110', usd: '120' },
             priceNumeric: { dzd: 18000, eur: 110, usd: 120 },
+            originalPrice: tp.plans.p1Original,
             paypalPlanId: 'PLAN_STANDARD_ACTIVE',
             chargelyUrl: '#',
             features: [
@@ -66,6 +69,7 @@ export default function PricingPage() {
             duration: tp.duration3,
             price: { dzd: '27,000', eur: '160', usd: '175' },
             priceNumeric: { dzd: 27000, eur: 160, usd: 175 },
+            originalPrice: tp.plans.p2Original,
             paypalPlanId: 'PLAN_PREMIUM_ACTIVE',
             chargelyUrl: '#',
             features: [
@@ -87,6 +91,7 @@ export default function PricingPage() {
             duration: tp.duration6,
             price: { dzd: '50,000', eur: '290', usd: '320' },
             priceNumeric: { dzd: 50000, eur: 290, usd: 320 },
+            originalPrice: tp.plans.p3Original,
             paypalPlanId: 'PLAN_ELITE_ACTIVE',
             chargelyUrl: '#',
             features: [
@@ -117,6 +122,10 @@ export default function PricingPage() {
             transition={{ duration: 0.5 }}
             dir={isRTL ? 'rtl' : 'ltr'}
         >
+            <SEO
+                title="Coaching Plans & Pricing"
+                description="Select the elite coaching plan that fits your goals. From the 90-day challenge to long-term performance optimization, find your path to excellence."
+            />
             {/* Page Hero */}
             <section className="relative pt-32 pb-16 overflow-hidden">
                 <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-brand-red/10 rounded-full blur-[120px] pointer-events-none" />
@@ -188,19 +197,27 @@ export default function PricingPage() {
                                     <h2 className="text-2xl font-display font-bold mb-1">{plan.name}</h2>
                                     <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 mb-2">{plan.subName}</div>
                                     <div className="text-xs font-bold uppercase tracking-[0.2em] text-brand-red mb-6">{plan.duration}</div>
-                                    <motion.div
-                                        key={currency}
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.3 }}
-                                        className="flex items-baseline justify-center gap-2"
-                                        dir="ltr"
-                                    >
-                                        <span className="text-5xl font-display font-black tracking-tighter">
-                                            {currency !== 'dzd' && currencyLabel[currency]}{plan.price[currency]}
-                                        </span>
-                                        {currency === 'dzd' && <span className="text-base font-bold text-white/40">DZD</span>}
-                                    </motion.div>
+                                    <div className="flex flex-col items-center gap-1 mb-6">
+                                        {plan.originalPrice && (
+                                            <div className="text-white/30 font-bold text-lg line-through decoration-brand-red/40 decoration-2 mb-1">
+                                                {currency !== 'dzd' && currencyLabel[currency]}{plan.originalPrice[currency]}
+                                                {currency === 'dzd' && <span className="text-xs ml-1 uppercase">DZD</span>}
+                                            </div>
+                                        )}
+                                        <motion.div
+                                            key={currency}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.3 }}
+                                            className="flex items-baseline justify-center gap-2"
+                                            dir="ltr"
+                                        >
+                                            <span className="text-5xl font-display font-black tracking-tighter">
+                                                {currency !== 'dzd' && currencyLabel[currency]}{plan.price[currency]}
+                                            </span>
+                                            {currency === 'dzd' && <span className="text-base font-bold text-white/40 uppercase">DZD</span>}
+                                        </motion.div>
+                                    </div>
                                 </div>
 
                                 {/* Features */}

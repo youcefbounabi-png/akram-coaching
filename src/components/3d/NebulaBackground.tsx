@@ -1,13 +1,12 @@
 import { useRef, useMemo, memo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Points, PointMaterial } from '@react-three/drei';
+import { Points, PointMaterial, Preload } from '@react-three/drei';
 import * as THREE from 'three';
 
 function ParticleNebula() {
   const ref = useRef<THREE.Points>(null);
-  // 4000 particles — restored to near-original density for visual richness
-  // while still saving ~20% vs the original 5000
-  const count = 4000;
+  // 3500 particles for performance (visually indistinguishable from 4000)
+  const count = 3500;
 
   const positions = useMemo(() => {
     const arr = new Float32Array(count * 3);
@@ -54,6 +53,7 @@ const NebulaBackground = memo(function NebulaBackground() {
       >
         <fog attach="fog" args={['#050505', 12, 28]} />
         <ParticleNebula />
+        <Preload all />
       </Canvas>
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brand-dark/20 to-brand-dark pointer-events-none" />
     </div>

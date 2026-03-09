@@ -5,11 +5,15 @@ import { BRAND } from '../constants';
 import ProgressRing3D from '../components/3d/ProgressRing3D';
 import { useLanguage } from '../i18n/LanguageContext';
 import { cn } from '../lib/utils';
+import SEO from '../components/SEO';
 import promoCoaching from '../assets/promo-coaching.webp';
+import ChallengeIntakeModal from '../components/ChallengeIntakeModal';
+import { useState } from 'react';
 
 
 export default function ChallengePage() {
     const { t, isRTL } = useLanguage();
+    const [showModal, setShowModal] = useState(false);
     const tc = t.challenge;
 
     const weeks = [
@@ -29,6 +33,10 @@ export default function ChallengePage() {
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }} dir={isRTL ? 'rtl' : 'ltr'}>
+            <SEO
+                title="90-Day Transformation Challenge"
+                description="Commit to radical change. Our flagship 90-day program is designed to re-engineer your lifestyle and physique using championship experience and medical science."
+            />
             <section className="relative min-h-[90vh] flex items-center pt-28 pb-20 overflow-hidden text-center md:text-start">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[45vw] md:text-[40vw] font-display font-black text-white/[0.025] select-none pointer-events-none leading-none z-0">
                     90
@@ -64,9 +72,12 @@ export default function ChallengePage() {
                             </div>
 
                             <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                                <Link to="/pricing" className="inline-flex items-center justify-center gap-3 bg-brand-red text-white px-10 py-5 rounded-full font-bold text-lg hover:scale-105 active:scale-95 transition-all duration-300 red-glow-strong group cursor-pointer">
+                                <button
+                                    onClick={() => setShowModal(true)}
+                                    className="inline-flex items-center justify-center gap-3 bg-brand-red text-white px-10 py-5 rounded-full font-bold text-lg hover:scale-105 active:scale-95 transition-all duration-300 red-glow-strong group cursor-pointer"
+                                >
                                     {tc.joinBtn}
-                                </Link>
+                                </button>
                                 <a href={BRAND.socials.whatsapp} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-3 glass-panel glass-panel-hover px-10 py-5 rounded-full font-bold text-lg cursor-pointer">
                                     {t.pricing.whatsappAlt}
                                 </a>
@@ -153,6 +164,11 @@ export default function ChallengePage() {
                     </div>
                 </div>
             </section>
+
+            <ChallengeIntakeModal
+                isOpen={showModal}
+                onClose={() => setShowModal(false)}
+            />
         </motion.div>
     );
 }

@@ -3,6 +3,8 @@ import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Hero from './components/Hero';
 import Books from './components/Books';
+import ImmersiveCTA from './components/ui/ImmersiveCTA';
+import SEO from './components/SEO';
 import { BRAND } from './constants';
 import { useLanguage } from './i18n/LanguageContext';
 
@@ -84,42 +86,25 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Primary CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center"
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border-brand-red/30 text-brand-red text-xs font-bold uppercase tracking-[0.2em] mb-8">
-              <ShieldCheck size={14} aria-hidden="true" />
-              {th.limitedSpots}
-            </div>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                to="/pricing"
-                className="inline-flex items-center gap-3 bg-brand-red text-white px-10 py-5 rounded-full font-bold text-lg hover:scale-105 active:scale-95 transition-all duration-300 red-glow-strong group cursor-pointer"
-              >
-                {th.seePricing}
-                <ArrowRight size={20} className={cn("transition-transform", isRTL ? "group-hover:-translate-x-1 rotate-180" : "group-hover:translate-x-1")} aria-hidden="true" />
-              </Link>
-              <Link
-                to="/transformations"
-                className="inline-flex items-center gap-3 glass-panel glass-panel-hover px-10 py-5 rounded-full font-bold text-lg cursor-pointer"
-              >
-                {th.viewTransformations}
-              </Link>
-            </div>
-          </motion.div>
+
         </div>
       </section>
 
-      {/* E-Books & Resources */}
-      <Books />
+      <Books variant="section" />
 
       {/* Stats Bar */}
-      <section className="py-16 border-t border-white/5" dir="ltr">
+      <section
+        className="py-16 border-t border-white/5"
+        dir="ltr"
+        style={{
+          maskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)',
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)'
+        }}
+      >
+        <SEO
+          title="Elite Performance & Health Optimization"
+          description="Transform your physique and mindset with expert guidance from Dr. Akram Ikni, 3x Bodybuilding Champion and Doctor of Pharmacy. Science-backed results for the modern athlete."
+        />
         <div className="container max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {BRAND.stats.map((stat) => (
@@ -138,6 +123,14 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Final Immersive CTA */}
+      <ImmersiveCTA
+        title={th.ctaTitle}
+        subtitle={th.joinElite}
+        buttonText={th.seePricing}
+        href="/pricing"
+      />
     </motion.div>
   );
 }

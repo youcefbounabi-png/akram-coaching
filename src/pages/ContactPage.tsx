@@ -4,6 +4,7 @@ import { Send, MessageSquare, MapPin, Instagram, Youtube, Calendar, Clock, Check
 import { BRAND } from '../constants';
 import { useLanguage } from '../i18n/LanguageContext';
 import { supabase } from '../lib/supabase';
+import SEO from '../components/SEO';
 
 const TIMES = ['09:00', '10:30', '12:00', '14:00', '16:00', '18:00'];
 
@@ -151,6 +152,10 @@ export default function ContactPage() {
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }} dir={isRTL ? 'rtl' : 'ltr'}>
+            <SEO
+                title="Get in Touch | Contact Coach Akram"
+                description="Ready to start your transformation? Contact us today for inquiries about elite performance coaching, training, and nutrition programs."
+            />
             <section className="relative pt-32 pb-16 overflow-hidden">
                 <div className="absolute top-1/3 right-0 w-[500px] h-[500px] bg-brand-red/10 rounded-full blur-[120px] pointer-events-none translate-x-1/2" />
                 <div className="container max-w-7xl mx-auto px-6 relative z-10">

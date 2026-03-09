@@ -16,6 +16,27 @@
     @apply bg-brand-dark text-white selection:bg-brand-red selection:text-white overflow-x-hidden;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
+
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  .lenis.lenis-scrolling iframe {
+    pointer-events: none;
+  }
 }
 
 /* ─── Arabic / RTL Typography ─────────────────────────────────────────────────
@@ -50,11 +71,16 @@
 }
 
 .glass-panel {
-  @apply bg-white/[0.02] backdrop-blur-xl border border-white/[0.05] shadow-[0_8px_32px_0_rgba(0,0,0,0.3)];
+  @apply bg-white/[0.02] backdrop-blur-xl border border-white/[0.05];
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
 }
 
 .glass-panel-hover {
-  @apply hover:bg-white/[0.04] hover:border-white/[0.1] hover:shadow-[0_8px_32px_0_rgba(236,54,66,0.1)] transition-all duration-500;
+  @apply hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-500;
+}
+
+.glass-panel-hover:hover {
+  box-shadow: 0 8px 32px 0 rgba(236, 54, 66, 0.1);
 }
 
 /* Holographic Panel */

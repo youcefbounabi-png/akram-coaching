@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import BackToTop from './components/BackToTop';
 import FloatingChatbot from './components/FloatingChatbot';
+import SmoothScroll from './components/SmoothScroll';
 import { supabase } from './lib/supabase';
 import Home from './Home';
 import About from './components/About';
@@ -12,6 +13,7 @@ import ServicesPage from './pages/ServicesPage';
 import ChallengePage from './pages/ChallengePage';
 import TransformationsPage from './pages/TransformationsPage';
 import PricingPage from './pages/PricingPage';
+import BooksPage from './pages/BooksPage';
 import ContactPage from './pages/ContactPage';
 import AdminDashboard from './pages/AdminDashboard';
 import PaymentSuccess from './pages/PaymentSuccess';
@@ -55,32 +57,35 @@ function AppLayout() {
   }, [pathname, isAdmin]);
 
   return (
-    <div className="min-h-screen flex flex-col font-sans selection:bg-brand-red selection:text-white relative">
-      {!isAdmin && (
-        <Suspense fallback={<div className="fixed inset-0 z-0 bg-brand-dark" />}>
-          <NebulaBackground />
-        </Suspense>
-      )}
-      {!isAdmin && <Header />}
-      <main className="flex-grow relative z-10">
-        <AnimatePresence mode="wait">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/services" element={<ServicesPage />} />
-            <Route path="/challenge" element={<ChallengePage />} />
-            <Route path="/transformations" element={<TransformationsPage />} />
-            <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/payment-success" element={<PaymentSuccess />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-          </Routes>
-        </AnimatePresence>
-      </main>
-      {!isAdmin && <Footer />}
-      {!isAdmin && <BackToTop />}
-      {!isAdmin && <FloatingChatbot />}
-    </div>
+    <SmoothScroll>
+      <div className="min-h-screen flex flex-col font-sans selection:bg-brand-red selection:text-white relative">
+        {!isAdmin && (
+          <Suspense fallback={<div className="fixed inset-0 z-0 bg-brand-dark" />}>
+            <NebulaBackground />
+          </Suspense>
+        )}
+        {!isAdmin && <Header />}
+        <main className="flex-grow relative z-10">
+          <AnimatePresence mode="wait">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/services" element={<ServicesPage />} />
+              <Route path="/challenge" element={<ChallengePage />} />
+              <Route path="/books" element={<BooksPage />} />
+              <Route path="/transformations" element={<TransformationsPage />} />
+              <Route path="/pricing" element={<PricingPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/payment-success" element={<PaymentSuccess />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+            </Routes>
+          </AnimatePresence>
+        </main>
+        {!isAdmin && <Footer />}
+        {!isAdmin && <BackToTop />}
+        {!isAdmin && <FloatingChatbot />}
+      </div>
+    </SmoothScroll>
   );
 }
 

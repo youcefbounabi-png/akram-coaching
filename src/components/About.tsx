@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { GraduationCap, Trophy, HeartPulse, Award } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
+import SEO from './SEO';
 
 export default function About() {
   const { t, isRTL } = useLanguage();
@@ -15,6 +16,10 @@ export default function About() {
 
   return (
     <div className="pt-32 pb-24" dir={isRTL ? 'rtl' : 'ltr'}>
+      <SEO
+        title="About Coach Akram"
+        description="Meet Dr. Akram Ikni, a 3-time bodybuilding champion and Doctor of Pharmacy combining elite athletic experience with clinical science for ultimate physical transformation."
+      />
       <div className="container max-w-7xl mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-16 items-center mb-24">
           <motion.div

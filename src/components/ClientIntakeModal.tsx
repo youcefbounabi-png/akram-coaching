@@ -115,7 +115,7 @@ function ImageUpload({ label, value, onChange }: { label: string; value: string;
 
 // ─── Steps ────────────────────────────────────────────────────────────────────
 
-function Step1({ data, update, t }: { data: IntakeData; update: (k: keyof IntakeData, v: string) => void; t: TranslationKeys }) {
+function Step1({ data, update, t, planCurrency }: { data: IntakeData; update: (k: keyof IntakeData, v: string) => void; t: TranslationKeys, planCurrency: string }) {
     const f = t.intake.fields;
     return (
         <div className="space-y-5">
@@ -123,9 +123,11 @@ function Step1({ data, update, t }: { data: IntakeData; update: (k: keyof Intake
                 <FieldWrapper label={f.fullName} required>
                     <input type="text" className={inputCls} placeholder="e.g. Omar Benali" value={data.name} onChange={e => update('name', e.target.value)} />
                 </FieldWrapper>
-                <FieldWrapper label={f.email} required>
-                    <input type="email" className={inputCls} placeholder="your@email.com" value={data.email} onChange={e => update('email', e.target.value)} />
-                </FieldWrapper>
+                {planCurrency !== 'DZD' && (
+                    <FieldWrapper label={f.email} required>
+                        <input type="email" className={inputCls} placeholder="your@email.com" value={data.email} onChange={e => update('email', e.target.value)} />
+                    </FieldWrapper>
+                )}
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
                 <FieldWrapper label={f.whatsapp} required>
@@ -194,8 +196,9 @@ function Step3({ data, update, t }: { data: IntakeData; update: (k: keyof Intake
 
 // ─── Step Completeness Guards ─────────────────────────────────────────────────
 
-function isStep1Valid(d: IntakeData) {
-    return !!d.name.trim() && !!d.email.trim() && !!d.whatsapp.trim() && !!d.age && !!d.gender && !!d.country.trim();
+function isStep1Valid(d: IntakeData, planCurrency: string) {
+    const emailValid = planCurrency === 'DZD' ? true : !!d.email.trim();
+    return !!d.name.trim() && emailValid && !!d.whatsapp.trim() && !!d.age && !!d.gender && !!d.country.trim();
 }
 function isStep2Valid(d: IntakeData) {
     return !!d.weight && !!d.height && !!d.goal;
@@ -203,7 +206,7 @@ function isStep2Valid(d: IntakeData) {
 function isStep3Valid(d: IntakeData) {
     return !!d.frontPic && !!d.sidePic && !!d.backPic;
 }
-const validators = [isStep1Valid, isStep2Valid, isStep3Valid];
+const validators = [isStep1Valid, isStep2Valid, isStep3Valid] as const;
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
@@ -279,7 +282,7 @@ export default function ClientIntakeModal({
         }
     };
 
-    const canProceed = validators[step]?.(data) ?? true;
+    const canProceed = step === 0 ? isStep1Valid(data, planCurrency) : validators[step]?.(data as any, '') ?? true;
 
     // Reset on close
     const handleClose = () => {
@@ -371,7 +374,7 @@ export default function ClientIntakeModal({
                                         exit={{ opacity: 0, x: isRTL ? 20 : -20 }}
                                         transition={{ duration: 0.25 }}
                                     >
-                                        {step === 0 && <Step1 data={data} update={update} t={t} />}
+                                        {step === 0 && <Step1 data={data} update={update} t={t} planCurrency={planCurrency} />}
                                         {step === 1 && <Step2 data={data} update={update} t={t} />}
                                         {step === 2 && <Step3 data={data} update={update} t={t} />}
                                     </motion.div>
@@ -437,7 +440,7 @@ export default function ClientIntakeModal({
                                                                         currency: 'DZD',
                                                                         planName: planName,
                                                                         clientName: data.name,
-                                                                        clientEmail: data.email,
+                                                                        clientEmail: data.email || 'no-email@akram-coaching.com',
                                                                         successUrl: window.location.origin + '/payment-success?' + successParams,
                                                                         failureUrl: window.location.origin + '?payment=failed'
                                                                     })

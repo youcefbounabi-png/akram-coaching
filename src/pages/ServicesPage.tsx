@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { BRAND } from '../constants';
 import { cn } from '../lib/utils';
 import { useLanguage } from '../i18n/LanguageContext';
+import SEO from '../components/SEO';
 
 export default function ServicesPage() {
     const { t, isRTL } = useLanguage();
@@ -64,6 +65,10 @@ export default function ServicesPage() {
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }} dir={isRTL ? 'rtl' : 'ltr'}>
+            <SEO
+                title="Premium Coaching Services"
+                description="Explore our range of elite coaching services, from custom training and nutrition to competition prep and health optimization, all backed by pharmaceutical science."
+            />
             <section className="relative min-h-[50vh] flex items-center pt-32 pb-20 overflow-hidden">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-red/10 rounded-full blur-[120px] pointer-events-none" />
                 <div className="container max-w-7xl mx-auto px-6 relative z-10 text-center md:text-start">

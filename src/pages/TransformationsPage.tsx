@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { BRAND } from '../constants';
 import { useLanguage } from '../i18n/LanguageContext';
 import { cn } from '../lib/utils';
+import SEO from '../components/SEO';
 
 type Category = 'all' | 'fat-loss' | 'muscle' | 'female' | '90-day';
 
@@ -87,6 +88,10 @@ export default function TransformationsPage() {
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }} dir={isRTL ? 'rtl' : 'ltr'}>
+            <SEO
+                title="Success Stories & Transformations"
+                description="Witness the incredible physical and mental transformations of our clients. Real people, real results, science-backed protocols from Coach Akram."
+            />
             {/* Hero */}
             <section className="relative min-h-[50vh] flex items-center pt-32 pb-20 overflow-hidden text-center md:text-start">
                 <div className={cn("absolute top-1/2 w-[500px] h-[500px] bg-brand-red/10 rounded-full blur-[100px] pointer-events-none", isRTL ? "left-0 -translate-x-1/2" : "right-0 translate-x-1/2")} />

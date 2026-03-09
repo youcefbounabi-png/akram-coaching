@@ -1,6 +1,6 @@
 import { useRef, useEffect, useMemo, memo, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, Environment, Octahedron, MeshTransmissionMaterial } from '@react-three/drei';
+import { Float, Environment, Octahedron, MeshTransmissionMaterial, BakeShadows, Preload } from '@react-three/drei';
 import * as THREE from 'three';
 
 // ---------------------------------------------------------------------------
@@ -129,8 +129,8 @@ function ChiseledCrystal() {
             transmission={0.98}
             ior={1.4}
             color="#dddddd"
-            // Reduced from 512 → 256 (halves FBO cost); 128 on low-power devices
-            resolution={isLowPower ? 128 : 256}
+            // Dramatically reduced resolution for FBO performance (glass look remains similar)
+            resolution={isLowPower ? 64 : 128}
           />
         </Octahedron>
 
@@ -180,6 +180,10 @@ const FloatingHero = memo(function FloatingHero({ isRTL = false }: { isRTL?: boo
         </group>
 
         <Environment files={['/potsdamer_platz_1k.hdr']} />
+
+        {/* Performance Optimizations */}
+        <BakeShadows />
+        <Preload all />
       </Canvas>
     </div>
   );
