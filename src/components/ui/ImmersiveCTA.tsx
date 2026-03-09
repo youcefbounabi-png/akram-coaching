@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -13,6 +13,15 @@ interface ImmersiveCTAProps {
     href?: string;
     onClick?: () => void;
     showBeams?: boolean;
+}
+
+// Detect if device is mobile/low-power — run once on mount
+function useIsMobile() {
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+        setIsMobile(window.innerWidth < 768 || /Mobi|Android/i.test(navigator.userAgent));
+    }, []);
+    return isMobile;
 }
 
 const Content = memo(({ title, subtitle, buttonText, onClick, isRTL }: any) => (
@@ -53,11 +62,11 @@ const Content = memo(({ title, subtitle, buttonText, onClick, isRTL }: any) => (
                 className="group relative inline-flex items-center justify-center gap-4 px-12 py-6 rounded-full bg-brand-dark overflow-hidden border border-white/20 transition-all duration-500 hover:border-brand-red/80 hover:shadow-[0_0_60px_rgba(236,54,66,0.4)] hover:-translate-y-2 shadow-[0_0_20px_rgba(0,0,0,0.5)]"
                 style={{ willChange: 'transform, box-shadow' }}
             >
-                {/* Sweeping Light Effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-in-out skew-x-12" style={{ willChange: 'transform' }} />
+                {/* Sweeping Light Effect - desktop only */}
+                <div className="hidden md:block absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-in-out skew-x-12" style={{ willChange: 'transform' }} />
 
-                {/* Hover internal glow */}
-                <div className="absolute inset-0 bg-gradient-to-r from-brand-red/0 via-brand-red/20 to-brand-red/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" style={{ willChange: 'transform' }} />
+                {/* Hover internal glow - desktop only */}
+                <div className="hidden md:block absolute inset-0 bg-gradient-to-r from-brand-red/0 via-brand-red/20 to-brand-red/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" style={{ willChange: 'transform' }} />
 
                 <span className="relative z-10 text-white font-bold tracking-[0.2em] uppercase text-sm md:text-base drop-shadow-md">
                     {buttonText}
@@ -75,8 +84,14 @@ const Content = memo(({ title, subtitle, buttonText, onClick, isRTL }: any) => (
     </div>
 ));
 
+Content.displayName = 'Content';
+
 const ImmersiveCTA = memo(({ title, subtitle, buttonText, href, onClick, showBeams = true }: ImmersiveCTAProps) => {
     const { isRTL } = useLanguage();
+    const isMobile = useIsMobile();
+
+    // On mobile: disable beams and heavy blur entirely
+    const renderBeams = showBeams && !isMobile;
 
     return (
         <section
@@ -85,50 +100,66 @@ const ImmersiveCTA = memo(({ title, subtitle, buttonText, href, onClick, showBea
             style={{
                 maskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)',
                 WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)',
-                willChange: 'mask-image'
             }}
         >
-            {/* Deep immersive background effects */}
+            {/* Background glow - simplified on mobile */}
             <div className="absolute inset-0 z-0 pointer-events-none">
-                {/* Subtle redshift glow */}
-                <motion.div
-                    animate={{
-                        opacity: [0.15, 0.3, 0.15],
-                        scale: [1, 1.2, 1],
-                    }}
-                    transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl h-[500px] bg-brand-red/15 blur-[120px] rounded-full"
-                    style={{ willChange: 'transform, opacity' }}
-                />
+                {isMobile ? (
+                    // Static glow on mobile - no animation = no CPU drain
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl h-[400px] bg-brand-red/10 blur-[100px] rounded-full" />
+                ) : (
+                    // Animated glow on desktop only
+                    <motion.div
+                        animate={{
+                            opacity: [0.15, 0.3, 0.15],
+                            scale: [1, 1.2, 1],
+                        }}
+                        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl h-[500px] bg-brand-red/15 blur-[120px] rounded-full"
+                        style={{ willChange: 'transform, opacity' }}
+                    />
+                )}
 
-                {/* Grid minimal texture */}
-                <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-[0.03]" />
+                {/* Grid texture - desktop only */}
+                {!isMobile && <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-[0.03]" />}
             </div>
 
             <div className="container max-w-5xl mx-auto px-6 relative z-10 flex justify-center">
-                {/* Glass panel container for the "quiet but effective" framing */}
-                <div className="w-full relative rounded-[3rem] p-10 md:p-20 overflow-hidden border border-white/10 shadow-[0_30px_100px_rgba(0,0,0,0.8)] before:absolute before:inset-0 before:bg-gradient-to-br before:from-brand-red/5 before:to-transparent before:opacity-50">
+                {/* Glass panel */}
+                <div className={cn(
+                    "w-full relative rounded-[3rem] p-10 md:p-20 overflow-hidden border border-white/10 shadow-[0_30px_100px_rgba(0,0,0,0.8)] before:absolute before:inset-0 before:bg-gradient-to-br before:from-brand-red/5 before:to-transparent before:opacity-50",
+                )}>
 
-                    {/* Contained Meteors / Beams strictly inside the box */}
-                    {showBeams && (
+                    {/* Background Beams — desktop only */}
+                    {renderBeams && (
                         <div className="absolute inset-0 z-0 text-brand-red">
                             <BackgroundBeams className="opacity-100 mix-blend-screen mix-blend-lighten" />
                         </div>
                     )}
 
-                    {/* Glowing animated border effect - optimized to use opacity */}
-                    <div className="absolute inset-0 rounded-[3rem] border border-brand-red/20 pointer-events-none z-10 overflow-hidden">
-                        <motion.div
-                            className="absolute inset-0 border border-brand-red/40 rounded-[3rem]"
-                            animate={{ opacity: [0, 1, 0] }}
-                            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                            style={{ willChange: 'opacity' }}
-                        />
-                    </div>
+                    {/* Glowing animated border — desktop only */}
+                    {!isMobile && (
+                        <div className="absolute inset-0 rounded-[3rem] border border-brand-red/20 pointer-events-none z-10 overflow-hidden">
+                            <motion.div
+                                className="absolute inset-0 border border-brand-red/40 rounded-[3rem]"
+                                animate={{ opacity: [0, 1, 0] }}
+                                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                                style={{ willChange: 'opacity' }}
+                            />
+                        </div>
+                    )}
 
-                    {/* Internal subtle lighting on the glass edge */}
+                    {/* Static border for mobile */}
+                    {isMobile && <div className="absolute inset-0 rounded-[3rem] border border-brand-red/20 pointer-events-none z-10" />}
+
+                    {/* Internal glass edge lighting */}
                     <div className="absolute -inset-[1px] bg-gradient-to-b from-white/20 to-transparent opacity-50 pointer-events-none rounded-[3rem] z-10" />
-                    <div className="absolute inset-0 bg-[#0a0a0a]/70 backdrop-blur-2xl rounded-[3rem] z-0 pointer-events-none" />
+
+                    {/* Glass backdrop — lighter blur on mobile */}
+                    <div className={cn(
+                        "absolute inset-0 bg-[#0a0a0a]/70 rounded-[3rem] z-0 pointer-events-none",
+                        isMobile ? "backdrop-blur-md" : "backdrop-blur-2xl"
+                    )} />
 
                     {href ? (
                         <Link to={href} className="block w-full h-full relative z-20 no-underline text-inherit group/link">
