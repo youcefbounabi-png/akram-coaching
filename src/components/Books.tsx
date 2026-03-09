@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { BookOpen, ShoppingCart, Info, X, MessageCircle, Truck } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
@@ -19,6 +19,16 @@ export default function Books({ variant = 'section' }: BooksProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const [activeBook, setActiveBook] = useState<number | null>(null);
     const [isHovered, setIsHovered] = useState(false);
+
+    // Lock body scroll when modal is open
+    useEffect(() => {
+        if (activeBook !== null) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => { document.body.style.overflow = ''; };
+    }, [activeBook]);
 
     const { scrollYProgress } = useScroll({
         target: containerRef,
@@ -314,13 +324,11 @@ export default function Books({ variant = 'section' }: BooksProps) {
                             >
                                 <button
                                     onClick={() => setActiveBook(null)}
-                                    className={cn(
-                                        "absolute top-4 md:top-6 z-50 w-12 h-12 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white flex items-center justify-center hover:bg-brand-red hover:border-brand-red transition-all cursor-pointer",
-                                        isRTL ? "left-4 md:left-6" : "right-4 md:right-6"
-                                    )}
+                                    className="absolute top-4 right-4 z-[200] w-14 h-14 rounded-full bg-brand-dark border-2 border-white/30 text-white flex items-center justify-center hover:bg-brand-red hover:border-brand-red transition-all cursor-pointer shadow-[0_0_20px_rgba(0,0,0,0.8)]"
                                     aria-label="Close modal"
+                                    style={{ backdropFilter: 'blur(8px)' }}
                                 >
-                                    <X size={20} />
+                                    <X size={24} strokeWidth={2.5} />
                                 </button>
 
                                 <div className="w-full md:w-[45%] h-[35vh] md:h-auto shrink-0 relative flex items-center justify-center bg-[#050505] overflow-hidden group">
