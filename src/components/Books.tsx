@@ -6,6 +6,7 @@ import { Environment, Float, PresentationControls, ContactShadows } from '@react
 import * as THREE from 'three';
 import ImmersiveCTA from './ui/ImmersiveCTA';
 import { useLanguage } from '../i18n/LanguageContext';
+import { useLenis } from 'lenis/react';
 import { cn } from '../lib/utils';
 import { BRAND, ALGERIAN_STATES } from '../constants';
 
@@ -19,16 +20,18 @@ export default function Books({ variant = 'section' }: BooksProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const [activeBook, setActiveBook] = useState<number | null>(null);
     const [isHovered, setIsHovered] = useState(false);
+    const lenis = useLenis();
 
-    // Lock ONLY the page scroll (not inner modal scroll) when modal is open
+    // Lock ONLY the global page scroll via Lenis, do NOT touch body.overflow
+    // as that breaks native touch scrolling on iOS/Mobile Chrome inside the modal.
     useEffect(() => {
         if (activeBook !== null) {
-            document.body.style.overflow = 'hidden';
+            lenis?.stop();
         } else {
-            document.body.style.overflow = '';
+            lenis?.start();
         }
-        return () => { document.body.style.overflow = ''; };
-    }, [activeBook]);
+        return () => { lenis?.start(); };
+    }, [activeBook, lenis]);
 
     const { scrollYProgress } = useScroll({
         target: containerRef,
