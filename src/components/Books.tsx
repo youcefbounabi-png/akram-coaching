@@ -311,16 +311,16 @@ export default function Books({ variant = 'section' }: BooksProps) {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/95 backdrop-blur-3xl"
+                            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/95 backdrop-blur-3xl relative"
                             onClick={() => setActiveBook(null)}
                         >
-                            {/* X button — outside overflow-hidden, always fully visible */}
+                            {/* X button — sits at top-right of the overlay, not inside overflow-hidden */}
                             <button
-                                onClick={() => setActiveBook(null)}
-                                className="fixed top-5 right-5 z-[300] w-14 h-14 rounded-full bg-[#111] border-2 border-white/40 text-white flex items-center justify-center hover:bg-brand-red hover:border-brand-red transition-all cursor-pointer shadow-[0_4px_24px_rgba(0,0,0,0.9)]"
+                                onClick={(e) => { e.stopPropagation(); setActiveBook(null); }}
+                                className="absolute top-4 right-4 z-[200] w-12 h-12 md:w-10 md:h-10 rounded-full bg-[#1a1a1a] border-2 border-white/40 text-white flex items-center justify-center hover:bg-brand-red hover:border-brand-red transition-all cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.9)]"
                                 aria-label="Close modal"
                             >
-                                <X size={24} strokeWidth={2.5} />
+                                <X size={22} strokeWidth={2.5} />
                             </button>
                             <motion.div
                                 initial={{ scale: 0.95, opacity: 0, y: 20 }}
