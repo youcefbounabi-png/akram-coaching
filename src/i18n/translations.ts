@@ -482,8 +482,8 @@ export const translations = {
         },
         books: {
             tagline: 'الكتب والمصادر التعليمية',
-            headline: 'خزانة',
-            headlineItalic: 'المعرفة',
+            headline: 'اهتم',
+            headlineItalic: 'بجسدك',
             subtitle: 'اكتشف البروتوكولات العلمية الدقيقة، أسرار التغذية، ومنهجيات التدريب التي يستخدمها د. أكرم لصناعة الأبطال.',
             cta: 'احصل على نسختك',
             ctaTitle: 'امتلك المعرفة',
