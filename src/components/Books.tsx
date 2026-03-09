@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { BookOpen, ShoppingCart, Info, X, MessageCircle, Truck } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
@@ -22,8 +23,6 @@ export default function Books({ variant = 'section' }: BooksProps) {
     const [isHovered, setIsHovered] = useState(false);
     const lenis = useLenis();
 
-    // Lock ONLY the global page scroll via Lenis, do NOT touch body.overflow
-    // as that breaks native touch scrolling on iOS/Mobile Chrome inside the modal.
     useEffect(() => {
         if (activeBook !== null) {
             lenis?.stop();
@@ -307,44 +306,48 @@ export default function Books({ variant = 'section' }: BooksProps) {
 
                 </div>
 
-                {/* Quick View & Checkout Modal */}
+            </section>
+
+            {/* Quick View & Checkout Modal — Portal isolates from scroll transforms */}
+            {typeof document !== 'undefined' && createPortal(
                 <AnimatePresence>
                     {activeBook !== null && (
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/95 backdrop-blur-3xl"
+                            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-8 bg-black/90 backdrop-blur-2xl text-white"
                             onClick={() => setActiveBook(null)}
                             data-lenis-prevent
                         >
                             <motion.div
-                                initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                                initial={{ scale: 0.9, opacity: 0, y: 30 }}
                                 animate={{ scale: 1, opacity: 1, y: 0 }}
-                                exit={{ scale: 0.95, opacity: 0 }}
+                                exit={{ scale: 0.9, opacity: 0, y: 30 }}
                                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                                 onClick={(e) => e.stopPropagation()}
-                                className="relative w-full max-w-6xl glass-panel rounded-[2rem] flex flex-col md:flex-row max-h-[95vh] border border-white/10 shadow-[0_0_100px_rgba(236,54,66,0.15)]"
+                                className="relative w-full max-w-6xl bg-brand-dark rounded-[2.5rem] flex flex-col md:flex-row max-h-[90vh] border border-white/10 shadow-[0_0_100px_rgba(0,0,0,1)] overflow-hidden"
                             >
-                                {/* X button — absolute inside panel, panel has no overflow-hidden so it won't be clipped */}
+                                {/* X Close Button */}
                                 <button
                                     onClick={() => setActiveBook(null)}
-                                    className="absolute top-4 right-4 z-[50] w-12 h-12 rounded-full bg-[#1a1a1a] border-2 border-white/40 text-white flex items-center justify-center hover:bg-brand-red hover:border-brand-red transition-all cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.9)]"
+                                    className="absolute top-6 right-6 z-[100] w-12 h-12 rounded-full bg-brand-dark border border-white/20 text-white flex items-center justify-center hover:bg-brand-red hover:border-brand-red transition-all cursor-pointer shadow-lg"
                                     aria-label="Close modal"
                                 >
-                                    <X size={22} strokeWidth={2.5} />
+                                    <X size={24} />
                                 </button>
-                                <div className="w-full md:w-[45%] h-[35vh] md:h-auto shrink-0 relative flex items-center justify-center bg-[#050505] overflow-hidden group">
+
+                                <div className="w-full md:w-[45%] h-[35vh] md:h-auto shrink-0 relative flex items-center justify-center bg-black overflow-hidden group">
                                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] blur-[120px] pointer-events-none opacity-60" style={{ backgroundColor: books[activeBook].glow }} />
                                     <img src={books[activeBook].image} alt={books[activeBook].title} loading="eager" className="w-[75%] h-auto object-contain relative z-10 drop-shadow-[0_40px_80px_rgba(0,0,0,0.9)] transform transition-transform duration-1000 group-hover:scale-110 group-hover:rotate-3" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-20 md:hidden" />
                                 </div>
 
-                                <div className="w-full md:w-[55%] p-5 md:p-10 lg:p-14 flex flex-col justify-start bg-gradient-to-br from-[#0a0a0a] to-[#111] h-[65vh] md:h-[80vh] overflow-y-auto hide-scrollbar relative" data-lenis-prevent>
+                                <div className="w-full md:w-[55%] p-6 md:p-12 lg:p-16 flex flex-col justify-start bg-gradient-to-br from-[#0a0a0a] to-[#111] overflow-y-auto overscroll-contain relative" data-lenis-prevent>
                                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-red/30 text-[9px] font-bold uppercase tracking-[0.2em] text-brand-red mb-4 w-fit bg-brand-red/5">
                                         <BookOpen size={10} /> {isRTL ? 'تفاصيل الكتاب' : 'Book Details'}
                                     </div>
-                                    <h3 className="text-2xl md:text-4xl lg:text-5xl font-display font-black mb-4 leading-tight text-white drop-shadow-md">{books[activeBook].title}</h3>
+                                    <h3 className="text-3xl md:text-5xl font-display font-black mb-6 leading-tight text-white drop-shadow-md">{books[activeBook].title}</h3>
 
                                     <BookCheckoutFlow
                                         book={books[activeBook]}
@@ -356,8 +359,9 @@ export default function Books({ variant = 'section' }: BooksProps) {
                             </motion.div>
                         </motion.div>
                     )}
-                </AnimatePresence>
-            </section>
+                </AnimatePresence>,
+                document.body
+            )}
 
             {/* Quiet, Immersive Global Books CTA (Only on Books Page) */}
             {variant === 'full' && (
