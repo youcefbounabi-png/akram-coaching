@@ -314,6 +314,14 @@ export default function Books({ variant = 'section' }: BooksProps) {
                             className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/95 backdrop-blur-3xl"
                             onClick={() => setActiveBook(null)}
                         >
+                            {/* X button — outside overflow-hidden, always fully visible */}
+                            <button
+                                onClick={() => setActiveBook(null)}
+                                className="fixed top-5 right-5 z-[300] w-14 h-14 rounded-full bg-[#111] border-2 border-white/40 text-white flex items-center justify-center hover:bg-brand-red hover:border-brand-red transition-all cursor-pointer shadow-[0_4px_24px_rgba(0,0,0,0.9)]"
+                                aria-label="Close modal"
+                            >
+                                <X size={24} strokeWidth={2.5} />
+                            </button>
                             <motion.div
                                 initial={{ scale: 0.95, opacity: 0, y: 20 }}
                                 animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -322,15 +330,6 @@ export default function Books({ variant = 'section' }: BooksProps) {
                                 onClick={(e) => e.stopPropagation()}
                                 className="relative w-full max-w-6xl glass-panel rounded-[2rem] overflow-hidden flex flex-col md:flex-row max-h-[95vh] border border-white/10 shadow-[0_0_100px_rgba(236,54,66,0.15)]"
                             >
-                                <button
-                                    onClick={() => setActiveBook(null)}
-                                    className="absolute top-4 right-4 z-[200] w-14 h-14 rounded-full bg-brand-dark border-2 border-white/30 text-white flex items-center justify-center hover:bg-brand-red hover:border-brand-red transition-all cursor-pointer shadow-[0_0_20px_rgba(0,0,0,0.8)]"
-                                    aria-label="Close modal"
-                                    style={{ backdropFilter: 'blur(8px)' }}
-                                >
-                                    <X size={24} strokeWidth={2.5} />
-                                </button>
-
                                 <div className="w-full md:w-[45%] h-[35vh] md:h-auto shrink-0 relative flex items-center justify-center bg-[#050505] overflow-hidden group">
                                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] blur-[120px] pointer-events-none opacity-60" style={{ backgroundColor: books[activeBook].glow }} />
                                     <img src={books[activeBook].image} alt={books[activeBook].title} loading="eager" className="w-[75%] h-auto object-contain relative z-10 drop-shadow-[0_40px_80px_rgba(0,0,0,0.9)] transform transition-transform duration-1000 group-hover:scale-110 group-hover:rotate-3" />
