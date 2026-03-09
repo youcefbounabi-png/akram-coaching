@@ -126,7 +126,7 @@ export default function Books({ variant = 'section' }: BooksProps) {
                                 <span className="w-10 h-px bg-brand-red" />
                             </p>
                             <h2 className="text-5xl md:text-7xl lg:text-8xl font-display font-black text-white leading-tight mb-4 drop-shadow-2xl">
-                                {tb.headline || 'Premium Books'}
+                                {tb.headline || 'Premium Books'} <span className="font-serif italic font-light text-brand-red">{tb.headlineItalic}</span>
                             </h2>
                             <p className="text-white/70 text-base md:text-xl font-light max-w-2xl mx-auto mb-10 drop-shadow-md">
                                 {tb.subtitle || 'Explore our handcrafted collection of physical guidebooks.'}
