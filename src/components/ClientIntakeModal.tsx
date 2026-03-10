@@ -184,7 +184,14 @@ function Step3({ data, update, t }: { data: IntakeData; update: (k: keyof Intake
     const f = t.intake.fields;
     return (
         <div className="space-y-5">
-            <p className="text-sm text-white/60 font-light mb-4">{f.uploadInstruction}</p>
+            <p className="text-sm text-white/60 font-light mb-4">
+                {f.uploadInstruction}
+                {data.gender === 'female' && (
+                    <span className="text-brand-red/60 text-[10px] ml-2 italic font-medium">
+                        {f.optionalForFemales}
+                    </span>
+                )}
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <ImageUpload label={f.frontPic} value={data.frontPic} onChange={v => update('frontPic', v)} />
                 <ImageUpload label={f.sidePic} value={data.sidePic} onChange={v => update('sidePic', v)} />
@@ -204,6 +211,7 @@ function isStep2Valid(d: IntakeData) {
     return !!d.weight && !!d.height && !!d.goal;
 }
 function isStep3Valid(d: IntakeData) {
+    if (d.gender === 'female') return true;
     return !!d.frontPic && !!d.sidePic && !!d.backPic;
 }
 const validators = [isStep1Valid, isStep2Valid, isStep3Valid] as const;
