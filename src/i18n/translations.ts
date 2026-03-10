@@ -180,6 +180,20 @@ export const translations = {
 
             payBaridi: 'Pay with BaridiMob',
             payWhatsapp: 'Pay via WhatsApp',
+            fields: {
+                deliveryDesk: 'Stop Desk (Delivery Company)',
+                deliveryHome: 'Home Delivery',
+                firstName: 'First Name',
+                lastName: 'Last Name',
+                phone: 'Phone Number',
+                state: 'State',
+                district: 'District',
+                deliveryDetails: 'Delivery Details',
+                quantity: 'Quantity',
+                total: 'Total DZD',
+                goBack: 'Go Back',
+                confirm: 'Confirm'
+            }
         },
         // Pricing
         pricing: {
@@ -513,6 +527,20 @@ export const translations = {
 
             payBaridi: 'الدفع عبر بريدي موب / CCP',
             payWhatsapp: 'الدفع عبر واتساب',
+            fields: {
+                deliveryDesk: 'مكتب شركة التوصيل',
+                deliveryHome: 'توصيل للمنزل',
+                firstName: 'الاسم الأول',
+                lastName: 'اللقب',
+                phone: 'رقم الهاتف',
+                state: 'الولاية',
+                district: 'البلدية',
+                deliveryDetails: 'معلومات التوصيل',
+                quantity: 'الكمية',
+                total: 'المجموع',
+                goBack: 'رجوع',
+                confirm: 'تأكيد'
+            }
         },
         pricing: {
             tagline: 'الاستثمار',

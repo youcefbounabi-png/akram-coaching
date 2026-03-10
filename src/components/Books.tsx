@@ -461,19 +461,19 @@ function BookCheckoutFlow({ book, isRTL, t, onClose }: { book: any, isRTL: boole
                 <form onSubmit={handleChargilyPay} className="space-y-5">
                     <p className="text-[10px] text-brand-red font-bold uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
                         <span className="w-4 h-px bg-brand-red"></span>
-                        {isRTL ? 'معلومات التوصيل' : 'Delivery Details'}
+                        {t.fields?.deliveryDetails || 'Delivery Details'}
                     </p>
                     <div className="grid grid-cols-2 gap-4">
-                        <input required type="text" placeholder={isRTL ? 'الاسم' : 'First Name'} value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} className={inputCls} />
-                        <input required type="text" placeholder={isRTL ? 'اللقب' : 'Last Name'} value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} className={inputCls} />
+                        <input required type="text" placeholder={t.fields?.firstName || 'First Name'} value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} className={inputCls} />
+                        <input required type="text" placeholder={t.fields?.lastName || 'Last Name'} value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} className={inputCls} />
                     </div>
-                    <input required type="tel" placeholder={isRTL ? 'رقم الهاتف' : 'Phone Number'} value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className={inputCls} />
+                    <input required type="tel" placeholder={t.fields?.phone || 'Phone Number'} value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className={inputCls} />
                     <div className="grid grid-cols-2 gap-4">
                         <select required value={formData.state} onChange={(e) => setFormData({ ...formData, state: e.target.value })} className={cn(inputCls, "appearance-none cursor-pointer text-white/80")}>
-                            <option value="" disabled className="bg-brand-dark">{isRTL ? 'الولاية' : 'State'}</option>
+                            <option value="" disabled className="bg-brand-dark">{t.fields?.state || 'State'}</option>
                             {ALGERIAN_STATES.map(s => <option key={s} value={s} className="bg-brand-dark">{s}</option>)}
                         </select>
-                        <input required type="text" placeholder={isRTL ? 'البلدية' : 'District'} value={formData.district} onChange={(e) => setFormData({ ...formData, district: e.target.value })} className={inputCls} />
+                        <input required type="text" placeholder={t.fields?.district || 'District'} value={formData.district} onChange={(e) => setFormData({ ...formData, district: e.target.value })} className={inputCls} />
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 mt-4">
@@ -487,7 +487,7 @@ function BookCheckoutFlow({ book, isRTL, t, onClose }: { book: any, isRTL: boole
                     </div>
 
                     <div className="flex items-center justify-between p-5 bg-black/40 rounded-xl border border-white/10 mt-6 shadow-inner">
-                        <span className="text-xs font-bold text-white/50 uppercase tracking-[0.2em]">{isRTL ? 'الكمية' : 'Quantity'}:</span>
+                        <span className="text-xs font-bold text-white/50 uppercase tracking-[0.2em]">{t.fields?.quantity || 'Quantity'}:</span>
                         <div className="flex items-center gap-6">
                             <button type="button" onClick={() => setFormData(f => ({ ...f, quantity: Math.max(1, f.quantity - 1) }))} className="text-white/50 hover:text-brand-red transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/5">-</button>
                             <span className="font-display text-2xl font-black">{formData.quantity}</span>
@@ -496,17 +496,17 @@ function BookCheckoutFlow({ book, isRTL, t, onClose }: { book: any, isRTL: boole
                     </div>
 
                     <div className="flex justify-between items-center py-6 border-t border-white/10 mt-6">
-                        <span className="text-xs text-white/50 uppercase tracking-[0.2em] font-bold">{isRTL ? 'المجموع' : 'Total DZD'}</span>
+                        <span className="text-xs text-white/50 uppercase tracking-[0.2em] font-bold">{t.fields?.total || 'Total DZD'}</span>
                         <span className="font-display text-4xl font-black text-brand-red drop-shadow-md">{totalPrice.toLocaleString()}</span>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                         <button type="button" onClick={() => setShowForm(false)} className="w-full py-4 rounded-xl font-bold tracking-[0.2em] uppercase text-xs transition-all duration-300 bg-white/5 border border-white/10 text-white hover:bg-white/10 cursor-pointer order-2 md:order-1">
-                            {isRTL ? 'رجوع' : 'Go Back'}
+                            {t.fields?.goBack || 'Go Back'}
                         </button>
                         <button type="submit" disabled={loading} className="w-full py-4 rounded-xl font-bold tracking-[0.2em] uppercase text-xs transition-all duration-300 bg-brand-red text-white hover:bg-red-600 red-glow-strong disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer order-1 md:order-2">
                             <ShoppingCart size={16} />
-                            {isRTL ? 'تأكيد' : 'Confirm'}
+                            {t.fields?.confirm || 'Confirm'}
                         </button>
                     </div>
                 </form>
