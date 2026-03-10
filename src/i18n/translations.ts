@@ -290,6 +290,7 @@ export const translations = {
                 backPic: 'Back Picture',
                 uploadInstruction: 'Please upload clear pictures in good lighting.',
                 optionalForFemales: '(Optional for females)',
+                goBack: 'Go Back',
             },
         },
         // Contact
@@ -637,6 +638,7 @@ export const translations = {
                 backPic: 'صورة خلفية',
                 uploadInstruction: 'يرجى رفع صور واضحة التقطت بإضاءة جيدة.',
                 optionalForFemales: '(اختياري للإناث)',
+                goBack: 'رجوع',
             },
         },
         contact: {
