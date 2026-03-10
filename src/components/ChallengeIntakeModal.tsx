@@ -87,6 +87,7 @@ export default function ChallengeIntakeModal({ isOpen, onClose }: Props) {
     const [step, setStep] = useState(0);
     const [data, setData] = useState<IntakeData>(initialData);
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const [paymentMethod, setPaymentMethod] = useState<'baridimob' | 'cod' | null>(null);
 
     React.useEffect(() => {
         if (isOpen) {
@@ -97,54 +98,95 @@ export default function ChallengeIntakeModal({ isOpen, onClose }: Props) {
     const f = t.intake.fields;
     const update = (key: keyof IntakeData, value: string) => setData(d => ({ ...d, [key]: value }));
 
-    const handleChargilyPay = async () => {
+    const handleSubmit = async (method: 'baridimob' | 'cod') => {
+        setPaymentMethod(method);
         setStatus('loading');
+
         try {
             const planName = t.nav.challenge;
             const price = 9900;
-            const successParams = new URLSearchParams({
-                method: 'Chargily',
-                plan: planName + ' (Physical)',
-                name: `${data.firstName} ${data.lastName}`,
-                email: 'no-email@akram-coaching.com',
-                amount: price.toString(),
-                currency: 'DZD'
-            }).toString();
 
-            const res = await fetch('https://akram-coaching.onrender.com/api/chargily/create-checkout', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    amount: price,
-                    currency: 'DZD',
-                    planName: planName + ' (Physical)',
-                    clientName: `${data.firstName} ${data.lastName}`,
-                    clientEmail: 'no-email@akram-coaching.com',
-                    successUrl: window.location.origin + '/payment-success?' + successParams,
-                    failureUrl: window.location.origin + '/challenge'
-                })
-            });
-
-            const resultData = await res.json();
-            if (!res.ok) throw new Error(resultData.error || 'Failed to create payment checkout');
-            if (!resultData.checkoutUrl) throw new Error('No checkout URL returned from server.');
-
-            // Fire Meta Pixel InitiateCheckout event
-            if (typeof window !== 'undefined' && (window as any).fbq) {
-                (window as any).fbq('track', 'InitiateCheckout', {
-                    content_name: planName + ' (Physical)',
-                    content_category: 'Challenge',
-                    value: price,
-                    currency: 'DZD'
+            // Notify Coach Akram via Email
+            try {
+                await fetch('https://akram-coaching.onrender.com/api/send-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: `${data.firstName} ${data.lastName}`,
+                        whatsapp: data.phone,
+                        plan: planName + ' (Physical)',
+                        type: 'challenge',
+                        paymentMethod: method === 'baridimob' ? 'BaridiMob' : 'Cash on Delivery',
+                        deliveryPref: data.deliveryPref === 'desk' ? 'Stop Desk' : 'Home Delivery',
+                        state: data.state,
+                        district: data.district,
+                        amount: price,
+                        currency: 'DZD'
+                    }),
+                }).then(r => {
+                    if (!r.ok) console.warn('[Challenge] Email automation might have failed.');
                 });
+            } catch (err) {
+                console.error('[Challenge] Email API unreachable:', err);
             }
 
-            setStatus('success');
+            if (method === 'baridimob') {
+                const successParams = new URLSearchParams({
+                    method: 'Chargily',
+                    plan: planName + ' (Physical)',
+                    name: `${data.firstName} ${data.lastName}`,
+                    email: 'no-email@akram-coaching.com',
+                    amount: price.toString(),
+                    currency: 'DZD'
+                }).toString();
 
-            // Redirect after a brief moment so they see success message
-            setTimeout(() => {
-                window.location.href = resultData.checkoutUrl;
-            }, 2000);
+                const res = await fetch('https://akram-coaching.onrender.com/api/chargily/create-checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: price,
+                        currency: 'DZD',
+                        planName: planName + ' (Physical)',
+                        clientName: `${data.firstName} ${data.lastName}`,
+                        clientEmail: 'no-email@akram-coaching.com',
+                        successUrl: window.location.origin + '/payment-success?' + successParams,
+                        failureUrl: window.location.origin + '/challenge'
+                    })
+                });
+
+                const resultData = await res.json();
+                if (!res.ok) throw new Error(resultData.error || 'Failed to create payment checkout');
+                if (!resultData.checkoutUrl) throw new Error('No checkout URL returned from server.');
+
+                // Fire Meta Pixel InitiateCheckout event
+                if (typeof window !== 'undefined' && (window as any).fbq) {
+                    (window as any).fbq('track', 'InitiateCheckout', {
+                        content_name: planName + ' (Physical)',
+                        content_category: 'Challenge',
+                        value: price,
+                        currency: 'DZD'
+                    });
+                }
+
+                setStatus('success');
+
+                setTimeout(() => {
+                    window.location.href = resultData.checkoutUrl;
+                }, 2000);
+            } else {
+                // Cash on Delivery
+                // Fire Meta Pixel Purchase event for COD
+                if (typeof window !== 'undefined' && (window as any).fbq) {
+                    (window as any).fbq('track', 'Purchase', {
+                        content_name: planName + ' (Physical)',
+                        content_category: 'Challenge',
+                        value: price,
+                        currency: 'DZD'
+                    });
+                }
+
+                setStatus('success');
+            }
         } catch (error) {
             console.error('[Challenge] Payment error:', error);
             setStatus('error');
@@ -277,9 +319,24 @@ export default function ChallengeIntakeModal({ isOpen, onClose }: Props) {
 
                                 {status === 'success' && (
                                     <motion.div key="success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="py-20 text-center space-y-4">
-                                        <CheckCircle2 size={48} className="text-brand-red mx-auto mb-4" />
-                                        <h3 className="text-2xl font-display font-black">Redirecting...</h3>
-                                        <p className="text-white/60 font-light text-sm">Transferring you to secure payment.</p>
+                                        {paymentMethod === 'baridimob' ? (
+                                            <>
+                                                <CheckCircle2 size={48} className="text-brand-red mx-auto mb-4" />
+                                                <h3 className="text-2xl font-display font-black">{isRTL ? 'جاري التحويل...' : 'Redirecting...'}</h3>
+                                                <p className="text-white/60 font-light text-sm">{isRTL ? 'يتم تحويلك لصفحة الدفع الآمنة' : 'Transferring you to secure payment.'}</p>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <CheckCircle2 size={48} className="text-brand-red mx-auto mb-4 animate-bounce drop-shadow-[0_0_15px_rgba(236,54,66,0.6)]" />
+                                                <h3 className="text-3xl font-display font-black text-white">{t.books?.physicalNotice || 'Physical Delivery'}</h3>
+                                                <p className="text-white/70 font-light text-base max-w-sm mx-auto p-4">
+                                                    {t.books?.deliveryNotice || 'Will be delivered in 24-48 hours'}
+                                                </p>
+                                                <button onClick={() => setStatus('idle')} className="mt-4 px-8 py-3 bg-brand-red text-white font-bold tracking-[0.2em] rounded-full uppercase text-xs hover:bg-red-600 transition-colors">
+                                                    {t.intake?.fields?.goBack || 'Go Back'}
+                                                </button>
+                                            </>
+                                        )}
                                     </motion.div>
                                 )}
 
@@ -310,13 +367,22 @@ export default function ChallengeIntakeModal({ isOpen, onClose }: Props) {
                                         Next {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
                                     </button>
                                 ) : (
-                                    <button
-                                        onClick={handleChargilyPay}
-                                        disabled={!isStep2Valid(data)}
-                                        className={cn('flex items-center gap-2 bg-brand-red text-white px-8 py-3.5 rounded-full font-bold text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer red-glow', isStep2Valid(data) ? 'hover:bg-brand-red/90 hover:scale-105 active:scale-95' : 'opacity-40 cursor-not-allowed')}
-                                    >
-                                        Pay 9,900 DZD {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-                                    </button>
+                                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                                        <button
+                                            onClick={() => handleSubmit('cod')}
+                                            disabled={!isStep2Valid(data)}
+                                            className={cn('w-full sm:w-auto flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-white px-5 sm:px-8 py-3.5 rounded-full font-bold text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer', isStep2Valid(data) ? 'hover:bg-white/10 hover:border-white/30 hover:scale-105 active:scale-95' : 'opacity-40 cursor-not-allowed')}
+                                        >
+                                            {t.intake.fields.payCod || 'Cash on Delivery'}
+                                        </button>
+                                        <button
+                                            onClick={() => handleSubmit('baridimob')}
+                                            disabled={!isStep2Valid(data)}
+                                            className={cn('w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-red text-white px-5 sm:px-8 py-3.5 rounded-full font-bold text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer red-glow', isStep2Valid(data) ? 'hover:bg-brand-red/90 hover:scale-105 active:scale-95' : 'opacity-40 cursor-not-allowed')}
+                                        >
+                                            {t.intake.fields.payBaridi || 'Pay via BaridiMob'} {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+                                        </button>
+                                    </div>
                                 )}
                             </div>
                         )}

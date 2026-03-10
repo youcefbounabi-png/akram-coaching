@@ -372,7 +372,11 @@ export default function Books({ variant = 'section' }: BooksProps) {
                     showBeams={false}
                     onClick={() => {
                         const el = document.getElementById('e-books');
-                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        if (el && lenis) {
+                            lenis.scrollTo(el);
+                        } else if (el) {
+                            el.scrollIntoView({ behavior: 'smooth' });
+                        }
                     }}
                 />
             )}
@@ -387,6 +391,7 @@ function BookCheckoutFlow({ book, isRTL, t, onClose }: { book: any, isRTL: boole
     const [showForm, setShowForm] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState<'baridimob' | 'cod' | null>(null);
     const [formData, setFormData] = useState({
         firstName: '', lastName: '', phone: '', state: '', district: '', deliveryPref: 'desk', quantity: 1
     });
@@ -400,30 +405,75 @@ function BookCheckoutFlow({ book, isRTL, t, onClose }: { book: any, isRTL: boole
 
     const inputCls = "w-full bg-black/40 border border-white/10 focus:border-brand-red focus:bg-white/5 outline-none rounded-xl px-5 py-4 text-white placeholder:text-white/30 text-sm transition-all duration-300 font-light shadow-inner";
 
-    const handleChargilyPay = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setShowSuccess(true);
 
+        // Notify Coach Akram via Email
         try {
-            const successParams = new URLSearchParams({
-                method: 'Baridimob', plan: `${book.title} (Qty: ${formData.quantity})`, name: `${formData.firstName} ${formData.lastName}`, email: 'no-email@akram-coaching.com', amount: totalPrice.toString(), currency: 'DZD'
-            }).toString();
-
-            const res = await fetch('https://akram-coaching.onrender.com/api/chargily/create-checkout', {
+            await fetch('https://akram-coaching.onrender.com/api/send-email', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    amount: totalPrice, currency: 'DZD', planName: `${book.title} (x${formData.quantity})`, clientName: `${formData.firstName} ${formData.lastName}`, clientEmail: 'no-email@akram-coaching.com', successUrl: window.location.origin + '/payment-success?' + successParams, failureUrl: window.location.origin + '/books'
-                })
+                    name: `${formData.firstName} ${formData.lastName}`,
+                    whatsapp: formData.phone,
+                    plan: `${book.title} (x${formData.quantity})`,
+                    type: 'book',
+                    paymentMethod: paymentMethod === 'baridimob' ? 'BaridiMob' : 'Cash on Delivery',
+                    deliveryPref: formData.deliveryPref === 'desk' ? 'Stop Desk' : 'Home Delivery',
+                    state: formData.state,
+                    district: formData.district,
+                    amount: totalPrice,
+                    currency: 'DZD'
+                }),
+            }).then(r => {
+                if (!r.ok) console.warn('[Books] Email automation might have failed.');
             });
+        } catch (err) {
+            console.error('[Books] Email API unreachable:', err);
+        }
 
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Checkout failed');
+        if (paymentMethod === 'baridimob') {
+            setShowSuccess(true);
+            try {
+                const successParams = new URLSearchParams({
+                    method: 'Baridimob', plan: `${book.title} (Qty: ${formData.quantity})`, name: `${formData.firstName} ${formData.lastName}`, email: 'no-email@akram-coaching.com', amount: totalPrice.toString(), currency: 'DZD'
+                }).toString();
 
-            // Fire Meta Pixel InitiateCheckout event
+                const res = await fetch('https://akram-coaching.onrender.com/api/chargily/create-checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: totalPrice, currency: 'DZD', planName: `${book.title} (x${formData.quantity})`, clientName: `${formData.firstName} ${formData.lastName}`, clientEmail: 'no-email@akram-coaching.com', successUrl: window.location.origin + '/payment-success?' + successParams, failureUrl: window.location.origin + '/books'
+                    })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Checkout failed');
+
+                // Fire Meta Pixel InitiateCheckout event
+                if (typeof window !== 'undefined' && (window as any).fbq) {
+                    (window as any).fbq('track', 'InitiateCheckout', {
+                        content_name: `${book.title} (x${formData.quantity})`,
+                        content_category: 'Books',
+                        value: totalPrice,
+                        currency: 'DZD'
+                    });
+                }
+
+                setTimeout(() => { window.location.href = data.checkoutUrl; }, 3000);
+            } catch (err) {
+                console.error('[Books] Payment Error:', err);
+                setShowSuccess(false);
+                setLoading(false);
+            }
+        } else {
+            // Cash on Delivery
+            setShowSuccess(true);
+
+            // Fire Meta Pixel Purchase event for COD
             if (typeof window !== 'undefined' && (window as any).fbq) {
-                (window as any).fbq('track', 'InitiateCheckout', {
+                (window as any).fbq('track', 'Purchase', {
                     content_name: `${book.title} (x${formData.quantity})`,
                     content_category: 'Books',
                     value: totalPrice,
@@ -431,10 +481,6 @@ function BookCheckoutFlow({ book, isRTL, t, onClose }: { book: any, isRTL: boole
                 });
             }
 
-            setTimeout(() => { window.location.href = data.checkoutUrl; }, 3000);
-        } catch (err) {
-            console.error('[Books] Payment Error:', err);
-            setShowSuccess(false);
             setLoading(false);
         }
     };
@@ -450,15 +496,22 @@ function BookCheckoutFlow({ book, isRTL, t, onClose }: { book: any, isRTL: boole
                             <p className="text-white/70 font-light text-base mb-8 leading-relaxed max-w-sm">
                                 {t.deliveryNotice || 'Will be delivered in 24-48 hours'}
                             </p>
-                            <div className="flex gap-3 items-center text-xs font-bold text-brand-red uppercase tracking-[0.2em]">
-                                <span className="w-5 h-5 rounded-full border-2 border-brand-red border-t-transparent animate-spin" />
-                                {isRTL ? 'جاري التحويل...' : 'Redirecting...'}
-                            </div>
+                            {paymentMethod === 'baridimob' && (
+                                <div className="flex gap-3 items-center text-xs font-bold text-brand-red uppercase tracking-[0.2em]">
+                                    <span className="w-5 h-5 rounded-full border-2 border-brand-red border-t-transparent animate-spin" />
+                                    {isRTL ? 'جاري التحويل...' : 'Redirecting...'}
+                                </div>
+                            )}
+                            {paymentMethod === 'cod' && (
+                                <button onClick={() => { setShowSuccess(false); setShowForm(false); }} className="mt-4 px-8 py-3 bg-brand-red text-white font-bold tracking-[0.2em] rounded-full uppercase text-xs hover:bg-red-600 transition-colors">
+                                    {t.fields?.goBack || 'Go Back'}
+                                </button>
+                            )}
                         </motion.div>
                     )}
                 </AnimatePresence>
 
-                <form onSubmit={handleChargilyPay} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-5">
                     <p className="text-[10px] text-brand-red font-bold uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
                         <span className="w-4 h-px bg-brand-red"></span>
                         {t.fields?.deliveryDetails || 'Delivery Details'}
@@ -534,21 +587,19 @@ function BookCheckoutFlow({ book, isRTL, t, onClose }: { book: any, isRTL: boole
 
                 <div className="space-y-4">
                     <button
-                        onClick={() => setShowForm(true)}
+                        onClick={() => { setPaymentMethod('baridimob'); setShowForm(true); }}
                         className="w-full py-5 rounded-xl font-bold text-sm tracking-[0.2em] uppercase text-center transition-all duration-300 active:scale-95 bg-brand-red text-white hover:bg-red-600 red-glow flex items-center justify-center gap-3 cursor-pointer group"
                     >
                         <ShoppingCart size={18} className="group-hover:scale-110 transition-transform" />
-                        {t.payBaridi || 'Buy Now (DZD)'}
+                        {t.payBaridi || 'Pay with BaridiMob'}
                     </button>
-                    <a
-                        href={`https://wa.me/${BRAND.socials.whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hello Coach Akram! I'm interested in the premium book: "${book.title}"`)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    <button
+                        onClick={() => { setPaymentMethod('cod'); setShowForm(true); }}
                         className="w-full py-5 rounded-xl font-bold text-sm tracking-[0.2em] uppercase text-center transition-all duration-300 active:scale-95 glass-panel glass-panel-hover text-white flex items-center justify-center gap-3 cursor-pointer group"
                     >
-                        <MessageCircle size={18} className="text-[#25D366] group-hover:scale-110 transition-transform" />
-                        {isRTL ? 'تواصل معنا' : 'Contact Support'}
-                    </a>
+                        <Truck size={18} className="text-white group-hover:scale-110 transition-transform" />
+                        {t.payCod || 'Cash on Delivery'}
+                    </button>
                 </div>
             </div>
         </div>

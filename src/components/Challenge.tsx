@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { BRAND } from '../constants';
 import { Zap, CheckCircle2, ArrowRight } from 'lucide-react';
 import ProgressRing3D from './3d/ProgressRing3D';
+import { Link } from 'react-router-dom';
 
 export default function Challenge() {
   const benefits = [
@@ -19,9 +20,9 @@ export default function Challenge() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[40vw] font-display font-black text-white/[0.02] select-none pointer-events-none leading-none tracking-tighter z-0">
         90
       </div>
-      
+
       <div className="container max-w-7xl mx-auto px-6 relative z-10">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
@@ -31,25 +32,25 @@ export default function Challenge() {
           <div className="grid lg:grid-cols-2">
             <div className="p-12 md:p-20 relative">
               <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-brand-red/10 to-transparent opacity-50" />
-              
+
               <div className="relative z-10">
                 <div className="inline-flex items-center gap-2 text-brand-red font-bold uppercase tracking-[0.2em] text-xs mb-8">
                   <Zap size={16} fill="currentColor" />
                   Most Effective Program
                 </div>
-                
+
                 <h2 className="text-5xl md:text-7xl font-display font-black mb-8 leading-[0.9] tracking-tighter uppercase">
                   The 90-Day <br />
                   <span className="font-serif italic font-light text-brand-red lowercase tracking-normal">Challenge</span>
                 </h2>
-                
+
                 <p className="text-white/60 text-lg mb-12 leading-relaxed font-light">
                   Our flagship program designed for those who are serious about radical transformation. We don't just change your body; we re-engineer your lifestyle using science and championship experience.
                 </p>
 
                 <div className="grid sm:grid-cols-2 gap-y-6 gap-x-4 mb-14">
                   {benefits.map((benefit, i) => (
-                    <motion.div 
+                    <motion.div
                       key={benefit}
                       initial={{ opacity: 0, x: -20 }}
                       whileInView={{ opacity: 1, x: 0 }}
@@ -63,13 +64,13 @@ export default function Challenge() {
                   ))}
                 </div>
 
-                <a 
-                  href={BRAND.socials.whatsapp}
+                <Link
+                  to="/challenge"
                   className="inline-flex items-center gap-3 bg-brand-red text-white px-10 py-5 rounded-full font-bold text-lg hover:scale-105 transition-all duration-300 red-glow-strong group"
                 >
                   APPLY FOR CHALLENGE
                   <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                </a>
+                </Link>
               </div>
             </div>
 

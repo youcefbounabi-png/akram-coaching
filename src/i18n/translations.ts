@@ -179,7 +179,7 @@ export const translations = {
             b3LongDesc: 'Tailored for the female athlete. Overcome plateaus, optimize training around your biology, and build strong, lean muscle without bulky appearances. This guide strips away industry myths and delivers science-backed protocols for sustainable, long-term female body recomposition.',
 
             payBaridi: 'Pay with BaridiMob',
-            payWhatsapp: 'Pay via WhatsApp',
+            payCod: 'Cash on Delivery',
             fields: {
                 deliveryDesk: 'Stop Desk (Delivery Company)',
                 deliveryHome: 'Home Delivery',
@@ -265,6 +265,8 @@ export const translations = {
                 deliveryPref: 'Delivery Preference',
                 deliveryDesk: 'Stop Desk (Delivery Company)',
                 deliveryHome: 'Home Delivery',
+                payBaridi: 'Pay via BaridiMob',
+                payCod: 'Cash on Delivery',
                 email: 'Email Address',
                 whatsapp: 'WhatsApp Number',
                 age: 'Age',
@@ -526,7 +528,7 @@ export const translations = {
             b3LongDesc: 'مخصص للرياضيات. تغلبي على ثبات الوزن، حسّني التدريب بناءً على طبيعة جسمك، وابني عضلات قوية ونحيفة. هذا الدليل يزيل الخرافات الشائعة ويقدم بروتوكولات علمية لإعادة تشكيل جسم المرأة بشكل مستدام وطويل الأمد.',
 
             payBaridi: 'الدفع عبر بريدي موب / CCP',
-            payWhatsapp: 'الدفع عبر واتساب',
+            payCod: 'الدفع عند الاستلام',
             fields: {
                 deliveryDesk: 'مكتب شركة التوصيل',
                 deliveryHome: 'توصيل للمنزل',
@@ -610,6 +612,8 @@ export const translations = {
                 deliveryPref: 'طريقة التوصيل',
                 deliveryDesk: 'مكتب شركة التوصيل',
                 deliveryHome: 'توصيل للمنزل',
+                payBaridi: 'الدفع عبر بريدي موب',
+                payCod: 'الدفع عند الاستلام',
                 email: 'البريد الإلكتروني',
                 whatsapp: 'رقم واتساب',
                 age: 'العمر',
