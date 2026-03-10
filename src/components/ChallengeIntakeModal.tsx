@@ -129,6 +129,16 @@ export default function ChallengeIntakeModal({ isOpen, onClose }: Props) {
             if (!res.ok) throw new Error(resultData.error || 'Failed to create payment checkout');
             if (!resultData.checkoutUrl) throw new Error('No checkout URL returned from server.');
 
+            // Fire Meta Pixel InitiateCheckout event
+            if (typeof window !== 'undefined' && (window as any).fbq) {
+                (window as any).fbq('track', 'InitiateCheckout', {
+                    content_name: planName + ' (Physical)',
+                    content_category: 'Challenge',
+                    value: price,
+                    currency: 'DZD'
+                });
+            }
+
             setStatus('success');
 
             // Redirect after a brief moment so they see success message

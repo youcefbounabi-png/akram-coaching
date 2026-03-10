@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import BackToTop from './components/BackToTop';
 import FloatingChatbot from './components/FloatingChatbot';
 import SmoothScroll from './components/SmoothScroll';
+import MetaPixel from './components/MetaPixel';
 import { supabase } from './lib/supabase';
 import Home from './Home';
 import About from './components/About';
@@ -58,6 +59,7 @@ function AppLayout() {
 
   return (
     <SmoothScroll>
+      <MetaPixel />
       <div className="min-h-screen flex flex-col font-sans selection:bg-brand-red selection:text-white relative">
         {!isAdmin && (
           <Suspense fallback={<div className="fixed inset-0 z-0 bg-brand-dark" />}>

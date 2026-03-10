@@ -48,6 +48,16 @@ export default function PaymentSuccess() {
                         setNotified(true);
                         localStorage.setItem(txId, 'true');
 
+                        // Fire Meta Pixel Purchase event
+                        if (typeof window !== 'undefined' && (window as any).fbq) {
+                            (window as any).fbq('track', 'Purchase', {
+                                value: parseFloat(data.amount) || 0,
+                                currency: data.currency || 'DZD',
+                                content_name: data.plan || 'Coaching Plan',
+                                content_type: 'product',
+                            });
+                        }
+
                         // Update Supabase with verified data
                         await supabase.from('client_intakes')
                             .update({ payment_status: 'paid', amount_paid: parseFloat(data.amount) || 0 })
@@ -67,6 +77,16 @@ export default function PaymentSuccess() {
                     if (res.ok) {
                         setNotified(true);
                         localStorage.setItem(txId, 'true');
+
+                        // Fire Meta Pixel Purchase event
+                        if (typeof window !== 'undefined' && (window as any).fbq) {
+                            (window as any).fbq('track', 'Purchase', {
+                                value: parseFloat(amount) || 0,
+                                currency: currency || 'DZD',
+                                content_name: plan || 'Coaching Plan',
+                                content_type: 'product',
+                            });
+                        }
                     }
                 }
             } catch (err: any) {

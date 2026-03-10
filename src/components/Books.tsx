@@ -421,6 +421,16 @@ function BookCheckoutFlow({ book, isRTL, t, onClose }: { book: any, isRTL: boole
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Checkout failed');
 
+            // Fire Meta Pixel InitiateCheckout event
+            if (typeof window !== 'undefined' && (window as any).fbq) {
+                (window as any).fbq('track', 'InitiateCheckout', {
+                    content_name: `${book.title} (x${formData.quantity})`,
+                    content_category: 'Books',
+                    value: totalPrice,
+                    currency: 'DZD'
+                });
+            }
+
             setTimeout(() => { window.location.href = data.checkoutUrl; }, 3000);
         } catch (err) {
             console.error('[Books] Payment Error:', err);

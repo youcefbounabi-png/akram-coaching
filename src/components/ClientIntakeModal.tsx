@@ -267,6 +267,16 @@ export default function ClientIntakeModal({
                 setIntakeId(insertedData[0].id);
             }
 
+            // Fire Meta Pixel Lead event
+            if (typeof window !== 'undefined' && (window as any).fbq) {
+                (window as any).fbq('track', 'Lead', {
+                    content_name: planName,
+                    content_category: 'Coaching',
+                    value: planPriceNumeric,
+                    currency: planCurrency || 'DZD'
+                });
+            }
+
             await fetch('https://akram-coaching.onrender.com/api/send-email', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -450,6 +460,16 @@ export default function ClientIntakeModal({
                                                                 if (!res.ok) throw new Error(resultData.error || 'Failed to create payment checkout');
                                                                 if (!resultData.checkoutUrl) throw new Error('No checkout URL returned from server.');
 
+                                                                // Fire Meta Pixel InitiateCheckout event
+                                                                if (typeof window !== 'undefined' && (window as any).fbq) {
+                                                                    (window as any).fbq('track', 'InitiateCheckout', {
+                                                                        content_name: planName,
+                                                                        content_category: 'Coaching',
+                                                                        value: planPriceNumeric,
+                                                                        currency: 'DZD'
+                                                                    });
+                                                                }
+
                                                                 // Redirect to the Chargily secure checkout
                                                                 window.location.href = resultData.checkoutUrl;
                                                             } catch (err) {
@@ -485,6 +505,17 @@ export default function ClientIntakeModal({
                                                                     },
                                                                 ],
                                                             });
+                                                        }}
+                                                        onInit={() => {
+                                                            // Fire Meta Pixel InitiateCheckout event when PayPal buttons are rendered/initialized
+                                                            if (typeof window !== 'undefined' && (window as any).fbq) {
+                                                                (window as any).fbq('track', 'InitiateCheckout', {
+                                                                    content_name: planName,
+                                                                    content_category: 'Coaching',
+                                                                    value: planPriceNumeric,
+                                                                    currency: planCurrency
+                                                                });
+                                                            }
                                                         }}
                                                         onApprove={async (_data, actions) => {
                                                             const details = await actions.order?.capture();
