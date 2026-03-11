@@ -48,9 +48,9 @@ export default function PricingPage() {
             name: tp.plans.p1Name,
             subName: tp.plans.p1Sub,
             duration: tp.duration2,
-            price: { dzd: '14,180', eur: '110', usd: '120' },
-            priceNumeric: { dzd: 14180, eur: 110, usd: 120 },
-            originalPrice: tp.plans.p1Original,
+            price: { dzd: '14,800', eur: '120', usd: '120' },
+            priceNumeric: { dzd: 14800, eur: 120, usd: 120 },
+            originalPrice: { dzd: '18,000', eur: '145', usd: '145' },
             paypalPlanId: 'PLAN_STANDARD_ACTIVE',
             chargelyUrl: '#',
             features: [
@@ -67,9 +67,9 @@ export default function PricingPage() {
             name: tp.plans.p2Name,
             subName: tp.plans.p2Sub,
             duration: tp.duration3,
-            price: { dzd: '18,180', eur: '160', usd: '175' },
-            priceNumeric: { dzd: 18180, eur: 160, usd: 175 },
-            originalPrice: tp.plans.p2Original,
+            price: { dzd: '18,800', eur: '170', usd: '180' },
+            priceNumeric: { dzd: 18800, eur: 170, usd: 180 },
+            originalPrice: { dzd: '27,000', eur: '210', usd: '220' },
             paypalPlanId: 'PLAN_PREMIUM_ACTIVE',
             chargelyUrl: '#',
             features: [
@@ -197,25 +197,13 @@ export default function PricingPage() {
                                     <h2 className="text-2xl font-display font-bold mb-1">{plan.name}</h2>
                                     <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 mb-2">{plan.subName}</div>
                                     <div className="text-xs font-bold uppercase tracking-[0.2em] text-brand-red mb-6">{plan.duration}</div>
-                                    <div className="flex flex-col items-center gap-2 mb-6">
+                                    <div className="flex flex-col items-center gap-1 mb-6">
                                         {plan.originalPrice && (
-                                            <div className="flex flex-col items-center gap-1">
-                                                <div className="relative inline-flex items-center gap-1">
-                                                    <span className="text-white/50 font-bold text-xl tracking-tight line-through decoration-brand-red decoration-[2.5px]">
-                                                        {currency !== 'dzd' && currencyLabel[currency]}{plan.originalPrice[currency]}
-                                                        {currency === 'dzd' && <span className="text-xs ml-1 uppercase">DZD</span>}
-                                                    </span>
-                                                </div>
-                                                {currency === 'dzd' && (() => {
-                                                    const orig = parseInt(plan.originalPrice['dzd'].replace(/,/g, ''));
-                                                    const curr = parseInt(plan.price['dzd'].replace(/,/g, ''));
-                                                    const save = orig - curr;
-                                                    return (
-                                                        <span className="bg-brand-red/20 border border-brand-red/40 text-brand-red text-[10px] font-black uppercase tracking-[0.15em] px-2.5 py-0.5 rounded-full">
-                                                            SAVE {save.toLocaleString()} DZD
-                                                        </span>
-                                                    );
-                                                })()}
+                                            <div className="relative inline-flex items-center gap-1 mb-1">
+                                                <span className="text-white/50 font-bold text-xl tracking-tight line-through decoration-brand-red decoration-[2.5px]">
+                                                    {currency !== 'dzd' && currencyLabel[currency]}{plan.originalPrice[currency]}
+                                                    {currency === 'dzd' && <span className="text-xs ml-1 uppercase">DZD</span>}
+                                                </span>
                                             </div>
                                         )}
                                         <motion.div
