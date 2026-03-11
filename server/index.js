@@ -9,6 +9,7 @@ import { Resend } from 'resend';
 import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
 import { coachEmail, clientConfirmationEmail, paymentNotificationEmail } from './emails.js';
+import { GoogleGenAI } from '@google/genai';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -61,6 +62,48 @@ app.use('/api/', limiter);
 app.use(express.json({ limit: '50mb' }));
 
 app.get('/api/health', (_req, res) => res.json({ ok: true, email_ready: !!RESEND_API_KEY }));
+
+// ─── AI Chat Endpoint ────────────────────────────────────────────────────────
+let aiClient = null;
+if (process.env.GEMINI_API_KEY) {
+    aiClient = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+} else {
+    console.warn('[server] GEMINI_API_KEY not set — AI chat will be disabled.');
+}
+
+app.post('/api/chat', async (req, res) => {
+    try {
+        if (!aiClient) {
+            return res.status(503).json({ error: 'AI service not configured.' });
+        }
+        
+        const { message, isFloating } = req.body;
+        
+        const systemInstruction = `You are AKBOT, Dr. Akram's official AI coaching assistant. 
+Your persona: Expert bodybuilding coach, pharmacist, encouraging, strict but supportive, professional.
+Akram's background: Bodybuilding Champion, Doctor of Pharmacy, 6+ years experience, 1200+ athletes trained.
+Akram's programs: 90-Day Challenge, Online Coaching, Competition Prep, Nutrition Plans. 
+Pricing: Starts at 14,180 DZD (2 months) up to 36,000 DZD for 6 months. Pay via BaridiMob or PayPal.
+Goal: Answer questions concisely, naturally, and always encourage the user to click "Join Now" or contact Akram on WhatsApp (+213 783 76 62 09) to start their transformation.
+CRITICAL RULE 1: You are strictly limited to the context of Akram Coaching, fitness, bodybuilding, nutrition, and this website. If a user asks about anything completely unrelated (e.g., coding, politics, general trivia, other companies), politely decline and steer the conversation back to fitness and Akram Coaching.
+CRITICAL RULE 2: LANGUAGE IS EXCLUSIVE. If the user speaks to you in English, your ENTIRE reply must be exclusively in English. If the user speaks to you in Arabic or Algerian Darja, your ENTIRE reply must be exclusively in Arabic/Darja. DO NOT mix English and Arabic in the same response.
+${isFloating ? 'Keep responses very short (2-3 sentences max) to fit in a small floating chat window.' : 'Responses should be informative and conversational.'}`;
+
+        const response = await aiClient.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: message,
+            config: {
+                systemInstruction,
+                temperature: 0.5,
+            }
+        });
+
+        return res.json({ text: response.text || null });
+    } catch (err) {
+        console.error('[server] AI Chat error:', err);
+        return res.status(500).json({ error: 'Failed to generate response' });
+    }
+});
 
 app.post('/api/send-email', async (req, res) => {
     const data = {
