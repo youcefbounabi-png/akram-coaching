@@ -77,20 +77,25 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 text-white/40 text-sm font-light">
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <p>© {currentYear} {BRAND.name}. {tf.rights}</p>
-            <span className="hidden sm:block text-white/20">·</span>
-            <p className="text-white/25 text-xs tracking-wide">
-              Designed &amp; Built with <span className="text-brand-red/60">♥</span> by{' '}
-              <a href="https://www.instagram.com/youcef.dev_" target="_blank" rel="noopener noreferrer" className="text-white/40 font-medium hover:text-brand-red transition-colors duration-300">
-                Youcef.dev_
-              </a>
-            </p>
+        <div className="pt-8 border-t border-white/10 flex flex-col gap-6 text-white/40 text-sm font-light">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <p>© {currentYear} {BRAND.name}. {tf.rights}</p>
+              <span className="hidden sm:block text-white/20">·</span>
+              <p className="text-white/25 text-xs tracking-wide">
+                Designed &amp; Built with <span className="text-brand-red/60">♥</span> by{' '}
+                <a href="https://www.instagram.com/youcef.dev_" target="_blank" rel="noopener noreferrer" className="text-white/40 font-medium hover:text-brand-red transition-colors duration-300">
+                  Youcef.dev_
+                </a>
+              </p>
+            </div>
+            <div className="flex items-center gap-8">
+              <a href="#" className="hover:text-white transition-colors">{tf.privacy}</a>
+              <a href="#" className="hover:text-white transition-colors">{tf.terms}</a>
+            </div>
           </div>
-          <div className="flex items-center gap-8">
-            <a href="#" className="hover:text-white transition-colors">{tf.privacy}</a>
-            <a href="#" className="hover:text-white transition-colors">{tf.terms}</a>
+          <div className="text-center text-xs text-white/30">
+            <p>Official Commercial Name: <strong>EURL IKNI M KARAN LILISTIRAD</strong> | Operating as: <strong>Coaching Dz</strong></p>
           </div>
         </div>
       </div>
