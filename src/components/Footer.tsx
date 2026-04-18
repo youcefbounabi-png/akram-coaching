@@ -84,7 +84,7 @@ export default function Footer() {
               <span className="hidden sm:block text-white/20">·</span>
               <p className="text-white/25 text-xs tracking-wide">
                 Designed &amp; Built with <span className="text-brand-red/60">♥</span> by{' '}
-                <a href="https://www.instagram.com/youcef.dev_" target="_blank" rel="noopener noreferrer" className="text-white/40 font-medium hover:text-brand-red transition-colors duration-300">
+                <a href="https://wa.me/213560684042" target="_blank" rel="noopener noreferrer" className="text-white/40 font-medium hover:text-brand-red transition-colors duration-300">
                   Youcef.dev_
                 </a>
               </p>

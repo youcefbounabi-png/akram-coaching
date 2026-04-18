@@ -14,7 +14,6 @@ import ServicesPage from './pages/ServicesPage';
 import ChallengePage from './pages/ChallengePage';
 import TransformationsPage from './pages/TransformationsPage';
 import PricingPage from './pages/PricingPage';
-import BooksPage from './pages/BooksPage';
 import ContactPage from './pages/ContactPage';
 import AdminDashboard from './pages/AdminDashboard';
 import PaymentSuccess from './pages/PaymentSuccess';
@@ -74,7 +73,6 @@ function AppLayout() {
               <Route path="/about" element={<About />} />
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/challenge" element={<ChallengePage />} />
-              <Route path="/books" element={<BooksPage />} />
               <Route path="/transformations" element={<TransformationsPage />} />
               <Route path="/pricing" element={<PricingPage />} />
               <Route path="/contact" element={<ContactPage />} />

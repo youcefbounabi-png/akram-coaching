@@ -2,7 +2,6 @@ import { motion } from 'motion/react';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Hero from './components/Hero';
-import Books from './components/Books';
 import ImmersiveCTA from './components/ui/ImmersiveCTA';
 import SEO from './components/SEO';
 import { BRAND } from './constants';
@@ -90,7 +89,7 @@ export default function Home() {
         </div>
       </section>
 
-      <Books variant="section" />
+
 
       {/* Stats Bar */}
       <section

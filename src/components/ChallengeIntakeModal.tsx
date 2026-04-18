@@ -116,7 +116,7 @@ export default function ChallengeIntakeModal({ isOpen, onClose }: Props) {
                         whatsapp: data.phone,
                         plan: planName + ' (Physical)',
                         type: 'challenge',
-                        paymentMethod: method === 'baridimob' ? 'BaridiMob' : 'Cash on Delivery',
+                        paymentMethod: method === 'baridimob' ? 'BaridiMob (WhatsApp)' : 'Cash on Delivery',
                         deliveryPref: data.deliveryPref === 'desk' ? 'Stop Desk' : 'Home Delivery',
                         state: data.state,
                         district: data.district,
@@ -131,33 +131,6 @@ export default function ChallengeIntakeModal({ isOpen, onClose }: Props) {
             }
 
             if (method === 'baridimob') {
-                const successParams = new URLSearchParams({
-                    method: 'Chargily',
-                    plan: planName + ' (Physical)',
-                    name: `${data.firstName} ${data.lastName}`,
-                    email: 'no-email@akram-coaching.com',
-                    amount: price.toString(),
-                    currency: 'DZD'
-                }).toString();
-
-                const res = await fetch('https://akram-coaching.onrender.com/api/chargily/create-checkout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        amount: price,
-                        currency: 'DZD',
-                        planName: planName + ' (Physical)',
-                        clientName: `${data.firstName} ${data.lastName}`,
-                        clientEmail: 'no-email@akram-coaching.com',
-                        successUrl: window.location.origin + '/payment-success?' + successParams,
-                        failureUrl: window.location.origin + '/challenge'
-                    })
-                });
-
-                const resultData = await res.json();
-                if (!res.ok) throw new Error(resultData.error || 'Failed to create payment checkout');
-                if (!resultData.checkoutUrl) throw new Error('No checkout URL returned from server.');
-
                 // Fire Meta Pixel InitiateCheckout event
                 if (typeof window !== 'undefined' && (window as any).fbq) {
                     (window as any).fbq('track', 'InitiateCheckout', {
@@ -168,14 +141,16 @@ export default function ChallengeIntakeModal({ isOpen, onClose }: Props) {
                     });
                 }
 
+                // Redirect to WhatsApp with pre-filled message
+                const waMessage = encodeURIComponent(
+                    `مرحبا Coach Akram 👋\n\nأريد الاشتراك في تحدي الـ 90 يوم (الكتاب المادي)\n\nمعلوماتي:\n- الاسم: ${data.firstName} ${data.lastName}\n- رقم الهاتف: ${data.phone}\n- السن: ${data.age}\n- الجنس: ${data.gender === 'male' ? 'ذكر' : 'أنثى'}\n- الولاية: ${data.state}\n- البلدية: ${data.district}\n- طريقة التوصيل: ${data.deliveryPref === 'desk' ? 'Stop Desk' : 'توصيل للمنزل'}\n- الوزن: ${data.weight} كغ | الطول: ${data.height} سم\n\nطريقة الدفع: BaridiMob\nالسعر: 9,900 DZD`
+                );
                 setStatus('success');
-
                 setTimeout(() => {
-                    window.location.href = resultData.checkoutUrl;
-                }, 2000);
+                    window.open(`https://wa.me/213783766209?text=${waMessage}`, '_blank');
+                }, 1500);
             } else {
-                // Cash on Delivery
-                // Fire Meta Pixel Purchase event for COD
+                // Cash on Delivery - Fire Meta Pixel Purchase event
                 if (typeof window !== 'undefined' && (window as any).fbq) {
                     (window as any).fbq('track', 'Purchase', {
                         content_name: planName + ' (Physical)',
