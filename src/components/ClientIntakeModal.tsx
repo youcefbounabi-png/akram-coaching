@@ -238,6 +238,7 @@ export default function ClientIntakeModal({
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [intakeId, setIntakeId] = useState<string | number | null>(null);
     const [paymentStatus, setPaymentStatus] = useState<'unpaid' | 'paid'>('unpaid');
+    const [imageUrls, setImageUrls] = useState<{ front?: string; side?: string; back?: string }>({});
 
     // Proactively wake up backend when user decides to start the intake form
     React.useEffect(() => {
@@ -255,7 +256,45 @@ export default function ClientIntakeModal({
     const handleSubmit = async () => {
         setStatus('loading');
         try {
-            // Try Supabase insert — non-blocking, errors are logged but don't stop the flow
+            // ── Helper: upload a base64 image to Supabase Storage & return its public URL
+            const uploadPhoto = async (base64: string, label: string): Promise<string | null> => {
+                if (!base64) return null;
+                try {
+                    const base64Data = base64.includes(',') ? base64.split(',')[1] : base64;
+                    const binary = atob(base64Data);
+                    const bytes = new Uint8Array(binary.length);
+                    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+                    const blob = new Blob([bytes], { type: 'image/jpeg' });
+                    const path = `${Date.now()}_${data.name.replace(/\s+/g, '_')}_${label}.jpg`;
+                    const { error: uploadErr } = await supabase.storage
+                        .from('client-intakes')
+                        .upload(path, blob, { upsert: true, contentType: 'image/jpeg' });
+                    if (uploadErr) { console.warn(`[Upload] ${label} failed:`, uploadErr.message); return null; }
+                    const { data: urlData } = supabase.storage.from('client-intakes').getPublicUrl(path);
+                    return urlData?.publicUrl ?? null;
+                } catch (e) {
+                    console.warn(`[Upload] ${label} error:`, e);
+                    return null;
+                }
+            };
+
+            // ── Upload the 3 progress photos in parallel (non-blocking)
+            const uploaded: { front?: string; side?: string; back?: string } = {};
+            try {
+                const [frontUrl, sideUrl, backUrl] = await Promise.all([
+                    data.frontPic ? uploadPhoto(data.frontPic, 'front') : Promise.resolve(null),
+                    data.sidePic  ? uploadPhoto(data.sidePic,  'side')  : Promise.resolve(null),
+                    data.backPic  ? uploadPhoto(data.backPic,  'back')  : Promise.resolve(null),
+                ]);
+                if (frontUrl) uploaded.front = frontUrl;
+                if (sideUrl)  uploaded.side  = sideUrl;
+                if (backUrl)  uploaded.back  = backUrl;
+                setImageUrls(uploaded);
+            } catch (uploadErr) {
+                console.warn('[Upload] Photo upload batch failed:', uploadErr);
+            }
+
+            // ── Supabase DB insert — non-blocking
             try {
                 const { data: insertedData, error } = await supabase.from('client_intakes').insert([{
                     full_name: data.name,
@@ -268,17 +307,13 @@ export default function ClientIntakeModal({
                     medical_conditions: data.injuries || null,
                     status: 'pending'
                 }]).select();
-
-                if (error) {
-                    console.warn('[Intake] Supabase insert warning:', error.message);
-                } else if (insertedData && insertedData[0]) {
-                    setIntakeId(insertedData[0].id);
-                }
+                if (error) console.warn('[Intake] Supabase insert warning:', error.message);
+                else if (insertedData?.[0]) setIntakeId(insertedData[0].id);
             } catch (dbErr) {
                 console.warn('[Intake] Supabase unreachable:', dbErr);
             }
 
-            // Fire Meta Pixel Lead event
+            // ── Meta Pixel Lead event
             if (typeof window !== 'undefined' && (window as any).fbq) {
                 (window as any).fbq('track', 'Lead', {
                     content_name: planName,
@@ -288,7 +323,7 @@ export default function ClientIntakeModal({
                 });
             }
 
-            // Send email notification to Coach Akram — also non-blocking
+            // ── Email notification to Coach Akram (non-blocking)
             fetch('https://akram-coaching.onrender.com/api/send-email', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -309,7 +344,7 @@ export default function ClientIntakeModal({
     // Reset on close
     const handleClose = () => {
         onClose();
-        setTimeout(() => { setStep(0); setData(initialData); setStatus('idle'); }, 300);
+        setTimeout(() => { setStep(0); setData(initialData); setStatus('idle'); setImageUrls({}); }, 300);
     };
 
     if (!isOpen) return null;
@@ -440,7 +475,32 @@ export default function ClientIntakeModal({
                                                 <div className="mt-4">
                                                     <a
                                                         href={`https://wa.me/213783766209?text=${encodeURIComponent(
-                                                            `مرحبا Coach Akram 👋\n\nأريد الاشتراك في برنامج: *${planName}*\n\nمعلوماتي:\n- الاسم: ${data.name}\n- السن: ${data.age}\n- رقم الهاتف: ${data.whatsapp}\n- الجنس: ${data.gender}\n- الدولة: ${data.country}\n- الوزن: ${data.weight} كغ\n- الطول: ${data.height} سم\n- الهدف: ${data.goal}\n\nالسعر: ${planPrice}`
+                                                            [
+                                                                `مرحبا Coach Akram 👋`,
+                                                                ``,
+                                                                `أريد الاشتراك في برنامج: *${planName}*`,
+                                                                ``,
+                                                                `📋 *معلوماتي:*`,
+                                                                `- الاسم: ${data.name}`,
+                                                                `- السن: ${data.age}`,
+                                                                `- رقم الهاتف: ${data.whatsapp}`,
+                                                                `- الجنس: ${data.gender === 'male' ? 'ذكر' : 'أنثى'}`,
+                                                                `- الدولة: ${data.country}`,
+                                                                `- الوزن: ${data.weight} كغ | الطول: ${data.height} سم`,
+                                                                `- الهدف: ${data.goal}`,
+                                                                data.injuries ? `- الإصابات: ${data.injuries}` : '',
+                                                                ``,
+                                                                `💰 السعر: ${planPrice}`,
+                                                                ``,
+                                                                (imageUrls.front || imageUrls.side || imageUrls.back)
+                                                                    ? [
+                                                                        `📸 *صور التقدم:*`,
+                                                                        imageUrls.front ? `🔹 الأمامية: ${imageUrls.front}` : '',
+                                                                        imageUrls.side  ? `🔹 الجانبية: ${imageUrls.side}`  : '',
+                                                                        imageUrls.back  ? `🔹 الخلفية: ${imageUrls.back}`   : '',
+                                                                      ].filter(Boolean).join('\n')
+                                                                    : '',
+                                                            ].filter(l => l !== undefined).join('\n')
                                                         )}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
@@ -452,7 +512,10 @@ export default function ClientIntakeModal({
                                                         Subscribe via WhatsApp
                                                     </a>
                                                     <p className="text-center text-white/30 text-xs mt-3 font-light">
-                                                        Coach Akram will confirm your subscription and payment details on WhatsApp
+                                                        {imageUrls.front || imageUrls.side || imageUrls.back
+                                                            ? '✅ Photos uploaded — Akram will receive your images via WhatsApp'
+                                                            : 'Coach Akram will confirm your subscription and payment details on WhatsApp'
+                                                        }
                                                     </p>
                                                 </div>
                                             )}
