@@ -28,6 +28,7 @@ export default function Header() {
     { name: t.nav.challenge, href: '/challenge' },
     { name: t.nav.transformations, href: '/transformations' },
     { name: t.nav.pricing, href: '/pricing' },
+    { name: t.nav.books, href: 'https://books.akramcoach.com/', external: true },
     { name: t.nav.contact, href: '/contact' },
   ];
 
@@ -59,20 +60,33 @@ export default function Header() {
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-6" aria-label="Main navigation">
           {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              to={link.href}
-              className={cn(
-                'text-xs font-bold uppercase tracking-[0.15em] transition-colors relative group py-2 cursor-pointer',
-                isActive(link.href) ? 'text-white' : 'text-white/60 hover:text-white'
-              )}
-            >
-              {link.name}
-              <span className={cn(
-                'absolute bottom-0 left-0 h-px bg-brand-red transition-all duration-300',
-                isActive(link.href) ? 'w-full' : 'w-0 group-hover:w-full'
-              )} />
-            </Link>
+            link.external ? (
+              <a
+                key={link.name}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs font-bold uppercase tracking-[0.15em] transition-colors relative group py-2 cursor-pointer text-white/60 hover:text-white"
+              >
+                {link.name}
+                <span className="absolute bottom-0 left-0 h-px bg-brand-red transition-all duration-300 w-0 group-hover:w-full" />
+              </a>
+            ) : (
+              <Link
+                key={link.name}
+                to={link.href}
+                className={cn(
+                  'text-xs font-bold uppercase tracking-[0.15em] transition-colors relative group py-2 cursor-pointer',
+                  isActive(link.href) ? 'text-white' : 'text-white/60 hover:text-white'
+                )}
+              >
+                {link.name}
+                <span className={cn(
+                  'absolute bottom-0 left-0 h-px bg-brand-red transition-all duration-300',
+                  isActive(link.href) ? 'w-full' : 'w-0 group-hover:w-full'
+                )} />
+              </Link>
+            )
           ))}
 
           <button
@@ -117,16 +131,29 @@ export default function Header() {
         >
           <nav className="flex flex-col gap-5" aria-label="Mobile navigation">
             {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.href}
-                className={cn(
-                  'text-xl font-display font-bold transition-colors cursor-pointer',
-                  isActive(link.href) ? 'text-brand-red' : 'text-white hover:text-brand-red'
-                )}
-              >
-                {link.name}
-              </Link>
+              link.external ? (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsOpen(false)}
+                  className="text-xl font-display font-bold transition-colors cursor-pointer text-white hover:text-brand-red"
+                >
+                  {link.name}
+                </a>
+              ) : (
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  className={cn(
+                    'text-xl font-display font-bold transition-colors cursor-pointer',
+                    isActive(link.href) ? 'text-brand-red' : 'text-white hover:text-brand-red'
+                  )}
+                >
+                  {link.name}
+                </Link>
+              )
             ))}
             <a
               href={BRAND.socials.whatsapp}
